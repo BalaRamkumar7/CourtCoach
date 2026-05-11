@@ -32,7 +32,7 @@ export default function HomeScreen() {
 
       <Button
         title="Start Training"
-        onPress={() => router.push('//skills')}
+        onPress={() => router.push('/skills')}
       />
     </View>
   );

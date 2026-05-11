@@ -17,7 +17,7 @@ export default function FeedbackScreen() {
 
       <Button
         title="Session Summary"
-        onPress={() => router.push('//summary')}
+        onPress={() => router.push('/summary')}
       />
     </View>
   );
