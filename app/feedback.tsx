@@ -1,22 +1,44 @@
-import { router } from 'expo-router';
 import { Button, Text, View } from 'react-native';
 
+import { useSession } from '../context/sessioncontext';
+
+import { router } from 'expo-router';
+
 export default function FeedbackScreen() {
+  const { feedbackHistory } = useSession();
+
   return (
     <View
       style={{
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         padding: 20,
+        justifyContent: 'center',
       }}
     >
-      <Text style={{ fontSize: 24 }}>
-        AI Feedback Placeholder
+      <Text
+        style={{
+          fontSize: 32,
+          fontWeight: 'bold',
+          marginBottom: 20,
+        }}
+      >
+        Session Feedback
       </Text>
 
+      {feedbackHistory.map((item, index) => (
+        <Text
+          key={index}
+          style={{
+            fontSize: 18,
+            marginBottom: 12,
+          }}
+        >
+          • {item}
+        </Text>
+      ))}
+
       <Button
-        title="Session Summary"
+        title="End Session"
         onPress={() => router.push('/summary')}
       />
     </View>
