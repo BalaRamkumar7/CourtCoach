@@ -39,16 +39,18 @@ Give ONE short coaching tip (1–2 sentences max) that addresses the most import
       'Content-Type': 'application/json',
       'x-api-key': API_KEY!,
       'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5',
       max_tokens: 60,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Claude API error: ${response.status}`);
+    const errBody = await response.json().catch(() => ({}));
+    throw new Error(`Claude API error: ${response.status} — ${errBody?.error?.message ?? JSON.stringify(errBody)}`);
   }
 
   const data = await response.json();
@@ -85,16 +87,18 @@ Based on the tips above, respond ONLY with a JSON object in this exact format:
       'Content-Type': 'application/json',
       'x-api-key': API_KEY!,
       'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5',
       max_tokens: 300,
       messages: [{ role: 'user', content: prompt }],
     }),
   });
 
   if (!response.ok) {
-    throw new Error(`Claude API error: ${response.status}`);
+    const errBody = await response.json().catch(() => ({}));
+    throw new Error(`Claude API error: ${response.status} — ${errBody?.error?.message ?? JSON.stringify(errBody)}`);
   }
 
   const data = await response.json();
