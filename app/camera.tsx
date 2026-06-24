@@ -12,9 +12,9 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 
 import { router, useLocalSearchParams } from 'expo-router';
 
+import { useSession } from '../context/sessioncontext';
 import { getRealtimeTip } from '../services/claude';
 import { speak } from '../services/speech';
-import { useSession } from '../context/sessioncontext';
 
 const COACHING_INTERVAL_MS = 8000;
 
@@ -22,6 +22,7 @@ export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [feedback, setFeedback] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   const { drill } = useLocalSearchParams<{ drill: string }>();
   const { addFeedback } = useSession();
@@ -42,8 +43,10 @@ export default function CameraScreen() {
         setFeedback(tip);
         addFeedback(tip);
         await speak(tip);
-      } catch (err) {
-        console.error('Coaching tip error:', err);
+      } catch (err: any) {
+        const msg = err?.message ?? String(err);
+        console.error('Coaching tip error:', msg);
+        setApiError(msg);
       } finally {
         isCallingRef.current = false;
         setIsAnalyzing(false);
@@ -87,6 +90,10 @@ export default function CameraScreen() {
         <View style={styles.feedbackOverlay}>
           <ActivityIndicator color="white" />
           <Text style={styles.feedbackText}>Analyzing...</Text>
+        </View>
+      ) : apiError ? (
+        <View style={[styles.feedbackOverlay, styles.errorOverlay]}>
+          <Text style={styles.feedbackText}>API Error: {apiError}</Text>
         </View>
       ) : feedback ? (
         <View style={styles.feedbackOverlay}>
@@ -156,5 +163,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     textAlign: 'center',
+  },
+
+  errorOverlay: {
+    backgroundColor: 'rgba(180,0,0,0.85)',
   },
 });
