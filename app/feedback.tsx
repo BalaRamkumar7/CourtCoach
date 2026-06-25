@@ -36,13 +36,13 @@ export default function FeedbackScreen() {
           feedbackHistory
         );
         setSummary(result);
+        setLoading(false);
 
         const spoken = `Session rating: ${result.overallRating}. ${result.topStrength} ${result.mainFocus} ${result.encouragement}`;
         await speak(spoken);
       } catch (err) {
         console.error('Summary error:', err);
         setError('Could not load summary. Check your internet connection.');
-      } finally {
         setLoading(false);
       }
     }
@@ -92,7 +92,7 @@ export default function FeedbackScreen() {
         </Text>
       ))}
 
-      <Button title="End Session" onPress={() => router.push('/summary')} />
+      <Button title="End Session" onPress={() => router.push('/')} />
     </ScrollView>
   );
 }
