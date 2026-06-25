@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Speech from 'expo-speech';
 
 import { router, useLocalSearchParams } from 'expo-router';
 
@@ -16,7 +17,7 @@ import { useSession } from '../context/sessioncontext';
 import { getRealtimeTip } from '../services/claude';
 import { speak } from '../services/speech';
 
-const COACHING_INTERVAL_MS = 8000;
+const PAUSE_BETWEEN_TIPS_MS = 3000;
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -27,39 +28,46 @@ export default function CameraScreen() {
   const { drill } = useLocalSearchParams<{ drill: string }>();
   const { addFeedback } = useSession();
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const isCallingRef = useRef(false);
+  const activeRef = useRef(false);
 
   useEffect(() => {
     if (!permission?.granted) return;
 
-    intervalRef.current = setInterval(async () => {
-      if (isCallingRef.current) return;
-      isCallingRef.current = true;
-      setIsAnalyzing(true);
+    activeRef.current = true;
 
-      try {
-        const tip = await getRealtimeTip(drill ?? 'Free Throw');
-        setFeedback(tip);
-        addFeedback(tip);
-        await speak(tip);
-      } catch (err: any) {
-        const msg = err?.message ?? String(err);
-        console.error('Coaching tip error:', msg);
-        setApiError(msg);
-      } finally {
-        isCallingRef.current = false;
-        setIsAnalyzing(false);
+    async function coachingLoop() {
+      while (activeRef.current) {
+        setIsAnalyzing(true);
+        try {
+          const tip = await getRealtimeTip(drill ?? 'Free Throw');
+          if (!activeRef.current) break;
+          setFeedback(tip);
+          addFeedback(tip);
+          setApiError('');
+          setIsAnalyzing(false);
+          await speak(tip);
+        } catch (err: any) {
+          const msg = err?.message ?? String(err);
+          console.error('Coaching tip error:', msg);
+          setApiError(msg);
+          setIsAnalyzing(false);
+        }
+
+        await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_TIPS_MS));
       }
-    }, COACHING_INTERVAL_MS);
+    }
+
+    coachingLoop();
 
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      activeRef.current = false;
+      Speech.stop();
     };
   }, [permission?.granted, drill]);
 
   function handleDone() {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    activeRef.current = false;
+    Speech.stop();
     router.push({ pathname: '/feedback', params: { drill } });
   }
 
