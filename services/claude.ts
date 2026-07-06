@@ -19,10 +19,14 @@ function generateFakePoseMetrics(): PoseMetrics {
   };
 }
 
-export async function getRealtimeTip(drill: string): Promise<string> {
+export async function getRealtimeTip(drill: string, focus: string = ''): Promise<string> {
   const metrics = generateFakePoseMetrics();
 
-  const prompt = `You are CourtCoach, an AI basketball coach. The player is performing a ${drill}.
+  const focusLine = focus
+    ? `\nThe player has asked to focus on: "${focus}". Prioritize this in your tip if relevant.`
+    : '';
+
+  const prompt = `You are CourtCoach, an AI basketball coach. The player is performing a ${drill}.${focusLine}
 
 Current body metrics detected:
 - Elbow angle: ${metrics.elbowAngle}° (ideal: 75–95°)

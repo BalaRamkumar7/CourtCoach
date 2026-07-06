@@ -33,8 +33,8 @@ export default function DrillScreen() {
           title={drill}
           onPress={() =>
             router.push({
-              pathname: '/camera',
-              params: { drill },
+              pathname: '/setup',
+              params: { drill, skill },
             })
           }
         />
