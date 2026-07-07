@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import {
   ActivityIndicator,
@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 
+import * as Speech from 'expo-speech';
 import { router, useLocalSearchParams } from 'expo-router';
 
 import { getSessionSummary, SessionSummary } from '../services/claude';
@@ -16,14 +17,21 @@ import { speak } from '../services/speech';
 import { useSession } from '../context/sessioncontext';
 
 export default function FeedbackScreen() {
-  const { feedbackHistory } = useSession();
-  const { drill } = useLocalSearchParams<{ drill: string }>();
+  const { feedbackHistory, saveSession, updateSessionSummary, resetSession } = useSession();
+  const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string }>();
 
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const sessionIdRef = useRef<string | null>(null);
+
   useEffect(() => {
+    // save session immediately so it appears in history even without a summary
+    if (feedbackHistory.length > 0) {
+      sessionIdRef.current = saveSession(drill ?? 'Free Throw', skill ?? '', feedbackHistory);
+    }
+
     async function loadSummary() {
       if (feedbackHistory.length === 0) {
         setLoading(false);
@@ -31,12 +39,13 @@ export default function FeedbackScreen() {
       }
 
       try {
-        const result = await getSessionSummary(
-          drill ?? 'Free Throw',
-          feedbackHistory
-        );
+        const result = await getSessionSummary(drill ?? 'Free Throw', feedbackHistory);
         setSummary(result);
         setLoading(false);
+
+        if (sessionIdRef.current) {
+          updateSessionSummary(sessionIdRef.current, result);
+        }
 
         const spoken = `Session rating: ${result.overallRating}. ${result.topStrength} ${result.mainFocus} ${result.encouragement}`;
         await speak(spoken);
@@ -49,6 +58,12 @@ export default function FeedbackScreen() {
 
     loadSummary();
   }, []);
+
+  function handleEndSession() {
+    Speech.stop();
+    resetSession();
+    router.push('/');
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -92,7 +107,7 @@ export default function FeedbackScreen() {
         </Text>
       ))}
 
-      <Button title="End Session" onPress={() => router.push('/')} />
+      <Button title="End Session" onPress={handleEndSession} />
     </ScrollView>
   );
 }

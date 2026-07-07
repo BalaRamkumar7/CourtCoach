@@ -34,6 +34,13 @@ export default function HomeScreen() {
         title="Start Training"
         onPress={() => router.push('/skills')}
       />
+
+      <View style={{ marginTop: 12 }}>
+        <Button
+          title="Stats & History"
+          onPress={() => router.push('/stats')}
+        />
+      </View>
     </View>
   );
 }
