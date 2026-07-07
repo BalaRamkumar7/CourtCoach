@@ -1,6 +1,13 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSession } from '../context/sessioncontext';
+import { toDisplayMetrics } from '../services/metrics';
+
+const STATUS_COLOR = {
+  good: '#22c55e',
+  warn: '#f59e0b',
+  bad: '#ef4444',
+};
 
 export default function SessionDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -53,6 +60,25 @@ export default function SessionDetailScreen() {
           <Text style={styles.cardText}>No summary available for this session.</Text>
         </View>
       )}
+
+      {session.avgMetrics ? (
+        <>
+          <Text style={styles.tipsTitle}>Average Metrics</Text>
+          <View style={styles.metricsBox}>
+            {toDisplayMetrics(session.avgMetrics).map((m) => (
+              <View key={m.key} style={styles.metricRow}>
+                <View style={styles.metricLeft}>
+                  <Text style={styles.metricLabel}>{m.label}</Text>
+                  <Text style={styles.metricIdeal}>ideal: {m.ideal}</Text>
+                </View>
+                <Text style={[styles.metricValue, { color: STATUS_COLOR[m.status] }]}>
+                  {m.value}{m.unit}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </>
+      ) : null}
 
       <Text style={styles.tipsTitle}>All Tips</Text>
       {session.tips.map((tip, i) => (
@@ -151,6 +177,42 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
+  },
+
+  metricsBox: {
+    backgroundColor: '#f9fafb',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 24,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  metricLeft: {
+    gap: 2,
+  },
+
+  metricLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+
+  metricIdeal: {
+    fontSize: 11,
+    color: '#9ca3af',
+  },
+
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '700',
   },
 
   tipBubble: {

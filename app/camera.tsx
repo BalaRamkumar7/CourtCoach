@@ -5,6 +5,7 @@ import {
   Button,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 
@@ -16,8 +17,15 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { useSession } from '../context/sessioncontext';
 import { getRealtimeTip } from '../services/claude';
 import { speak } from '../services/speech';
+import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
 
 const PAUSE_BETWEEN_TIPS_MS = 3000;
+
+const STATUS_COLOR = {
+  good: '#22c55e',
+  warn: '#f59e0b',
+  bad: '#ef4444',
+};
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -25,6 +33,8 @@ export default function CameraScreen() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [apiError, setApiError] = useState('');
   const [shotCount, setShotCount] = useState(0);
+  const [showMetrics, setShowMetrics] = useState(false);
+  const [liveMetrics, setLiveMetrics] = useState<PoseMetrics | null>(null);
 
   const { drill, skill, focus, shots, duration } =
     useLocalSearchParams<{
@@ -53,24 +63,24 @@ export default function CameraScreen() {
 
     async function coachingLoop() {
       while (activeRef.current) {
-        // stop if duration exceeded
         if (maxDurationMs && Date.now() - startTimeRef.current >= maxDurationMs) {
-          handleDone();
+          navigateToFeedback();
           break;
         }
 
-        // stop if shot limit reached
         if (maxShots && shotCountRef.current >= maxShots) {
-          handleDone();
+          navigateToFeedback();
           break;
         }
 
         setIsAnalyzing(true);
         try {
-          const tip = await getRealtimeTip(drill ?? 'Free Throw', focus ?? '');
+          const { tip, metrics } = await getRealtimeTip(drill ?? 'Free Throw', focus ?? '');
           if (!activeRef.current) break;
+
+          setLiveMetrics(metrics);
           setFeedback(tip);
-          addFeedback(tip);
+          addFeedback(tip, metrics);
           setApiError('');
           setIsAnalyzing(false);
 
@@ -81,12 +91,14 @@ export default function CameraScreen() {
 
           await speak(tip);
         } catch (err: any) {
+          if (!activeRef.current) break;
           const msg = err?.message ?? String(err);
           console.error('Coaching tip error:', msg);
           setApiError(msg);
           setIsAnalyzing(false);
         }
 
+        if (!activeRef.current) break;
         await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_TIPS_MS));
       }
     }
@@ -99,15 +111,17 @@ export default function CameraScreen() {
     };
   }, [permission?.granted, drill]);
 
-  function handleDone() {
+  function navigateToFeedback() {
     activeRef.current = false;
     Speech.stop();
-    router.push({ pathname: '/feedback', params: { drill } });
+    router.push({ pathname: '/feedback', params: { drill, skill } });
   }
 
-  if (!permission) {
-    return <View />;
+  function handleDone() {
+    navigateToFeedback();
   }
+
+  if (!permission) return <View />;
 
   if (!permission.granted) {
     return (
@@ -118,10 +132,13 @@ export default function CameraScreen() {
     );
   }
 
+  const displayMetrics = liveMetrics ? toDisplayMetrics(liveMetrics) : null;
+
   return (
     <View style={styles.container}>
       <CameraView style={styles.camera} />
 
+      {/* Drill label */}
       {drill ? (
         <View style={styles.drillLabel}>
           <Text style={styles.drillText}>{drill}</Text>
@@ -133,6 +150,34 @@ export default function CameraScreen() {
         </View>
       ) : null}
 
+      {/* Metrics toggle button */}
+      <TouchableOpacity
+        style={styles.metricsToggle}
+        onPress={() => setShowMetrics((v) => !v)}
+      >
+        <Text style={styles.metricsToggleText}>
+          {showMetrics ? 'Hide Metrics' : 'Show Metrics'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Live metrics overlay */}
+      {showMetrics && displayMetrics ? (
+        <View style={styles.metricsOverlay}>
+          {displayMetrics.map((m) => (
+            <View key={m.key} style={styles.metricRow}>
+              <Text style={styles.metricLabel}>{m.label}</Text>
+              <View style={styles.metricRight}>
+                <Text style={[styles.metricValue, { color: STATUS_COLOR[m.status] }]}>
+                  {m.value}{m.unit}
+                </Text>
+                <Text style={styles.metricIdeal}>ideal: {m.ideal}</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      {/* Tip / analyzing / error overlay */}
       {isAnalyzing ? (
         <View style={styles.feedbackOverlay}>
           <ActivityIndicator color="white" />
@@ -156,13 +201,9 @@ export default function CameraScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
+  container: { flex: 1 },
 
-  camera: {
-    flex: 1,
-  },
+  camera: { flex: 1 },
 
   drillLabel: {
     position: 'absolute',
@@ -185,6 +226,60 @@ const styles = StyleSheet.create({
   drillSubtext: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: 13,
+  },
+
+  metricsToggle: {
+    position: 'absolute',
+    top: 60,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 10,
+  },
+
+  metricsToggleText: {
+    color: 'white',
+    fontSize: 13,
+    fontWeight: '600',
+  },
+
+  metricsOverlay: {
+    position: 'absolute',
+    top: 110,
+    right: 16,
+    backgroundColor: 'rgba(0,0,0,0.75)',
+    borderRadius: 14,
+    padding: 14,
+    gap: 10,
+    minWidth: 220,
+  },
+
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  metricLabel: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 13,
+    flex: 1,
+  },
+
+  metricRight: {
+    alignItems: 'flex-end',
+  },
+
+  metricValue: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+
+  metricIdeal: {
+    color: 'rgba(255,255,255,0.4)',
+    fontSize: 10,
   },
 
   controls: {
@@ -211,6 +306,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     gap: 8,
+    maxWidth: '80%',
   },
 
   feedbackText: {

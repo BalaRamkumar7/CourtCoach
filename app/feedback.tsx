@@ -18,7 +18,7 @@ import { useSession } from '../context/sessioncontext';
 
 export default function FeedbackScreen() {
   const { feedbackHistory, saveSession, updateSessionSummary, resetSession } = useSession();
-  const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string }>();
+  const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string; metricsCount: string }>();
 
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +29,7 @@ export default function FeedbackScreen() {
   useEffect(() => {
     // save session immediately so it appears in history even without a summary
     if (feedbackHistory.length > 0) {
-      sessionIdRef.current = saveSession(drill ?? 'Free Throw', skill ?? '', feedbackHistory);
+      sessionIdRef.current = saveSession(drill ?? 'Free Throw', skill ?? '');
     }
 
     async function loadSummary() {

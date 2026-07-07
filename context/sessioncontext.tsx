@@ -3,12 +3,14 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SessionSummary } from '../services/claude';
+import { averageMetrics, PoseMetrics } from '../services/metrics';
 
 export interface SessionRecord {
   id: string;
@@ -17,13 +19,14 @@ export interface SessionRecord {
   date: number;
   tips: string[];
   summary: SessionSummary | null;
+  avgMetrics: PoseMetrics | null;
 }
 
 interface SessionContextType {
   feedbackHistory: string[];
   sessionHistory: SessionRecord[];
-  addFeedback: (feedback: string) => void;
-  saveSession: (drill: string, skill: string, tips: string[]) => string;
+  addFeedback: (tip: string, metrics: PoseMetrics) => void;
+  saveSession: (drill: string, skill: string) => string;
   updateSessionSummary: (id: string, summary: SessionSummary) => void;
   resetSession: () => void;
 }
@@ -35,6 +38,7 @@ const SessionContext = createContext<SessionContextType | undefined>(undefined);
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [feedbackHistory, setFeedbackHistory] = useState<string[]>([]);
   const [sessionHistory, setSessionHistory] = useState<SessionRecord[]>([]);
+  const metricsListRef = useRef<PoseMetrics[]>([]);
 
   useEffect(() => {
     AsyncStorage.getItem(STORAGE_KEY).then((raw) => {
@@ -46,12 +50,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(records));
   }
 
-  function addFeedback(feedback: string) {
-    setFeedbackHistory((prev) => [...prev, feedback]);
+  function addFeedback(tip: string, metrics: PoseMetrics) {
+    setFeedbackHistory((prev) => [...prev, tip]);
+    metricsListRef.current.push(metrics);
   }
 
-  function saveSession(drill: string, skill: string, tips: string[]): string {
+  function saveSession(drill: string, skill: string): string {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const tips = [...feedbackHistory];
+    const metricsList = [...metricsListRef.current];
     const record: SessionRecord = {
       id,
       drill,
@@ -59,6 +66,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       date: Date.now(),
       tips,
       summary: null,
+      avgMetrics: metricsList.length > 0 ? averageMetrics(metricsList) : null,
     };
     setSessionHistory((prev) => {
       const updated = [record, ...prev];
@@ -78,6 +86,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   function resetSession() {
     setFeedbackHistory([]);
+    metricsListRef.current = [];
   }
 
   return (
