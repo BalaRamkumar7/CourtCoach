@@ -10,7 +10,7 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { SessionSummary } from '../services/claude';
-import { averageMetrics, PoseMetrics } from '../services/metrics';
+import { averageMetrics, computeRating, PoseMetrics, RatingLabel } from '../services/metrics';
 
 export interface SessionRecord {
   id: string;
@@ -20,13 +20,14 @@ export interface SessionRecord {
   tips: string[];
   summary: SessionSummary | null;
   avgMetrics: PoseMetrics | null;
+  rating: RatingLabel | null;
 }
 
 interface SessionContextType {
   feedbackHistory: string[];
   sessionHistory: SessionRecord[];
   addFeedback: (tip: string, metrics: PoseMetrics) => void;
-  saveSession: (drill: string, skill: string) => string;
+  saveSession: (drill: string, skill: string) => { id: string; rating: RatingLabel | null };
   updateSessionSummary: (id: string, summary: SessionSummary) => void;
   resetSession: () => void;
 }
@@ -55,10 +56,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     metricsListRef.current.push(metrics);
   }
 
-  function saveSession(drill: string, skill: string): string {
+  function saveSession(drill: string, skill: string): { id: string; rating: RatingLabel | null } {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const tips = [...feedbackHistory];
     const metricsList = [...metricsListRef.current];
+    const avg = metricsList.length > 0 ? averageMetrics(metricsList) : null;
+    const rating = avg ? computeRating(avg) : null;
     const record: SessionRecord = {
       id,
       drill,
@@ -66,14 +69,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       date: Date.now(),
       tips,
       summary: null,
-      avgMetrics: metricsList.length > 0 ? averageMetrics(metricsList) : null,
+      avgMetrics: avg,
+      rating,
     };
     setSessionHistory((prev) => {
       const updated = [record, ...prev];
       persist(updated);
       return updated;
     });
-    return id;
+    return { id, rating };
   }
 
   function updateSessionSummary(id: string, summary: SessionSummary) {

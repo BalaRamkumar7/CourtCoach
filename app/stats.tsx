@@ -110,14 +110,16 @@ export default function StatsScreen() {
               <Text style={styles.sessionTips}>{session.tips.length} tips</Text>
             </View>
             <View style={styles.sessionRight}>
-              {session.summary ? (
+              {session.rating ? (
                 <View style={[
                   styles.ratingBadge,
-                  session.summary.overallRating === 'Excellent' && styles.ratingExcellent,
-                  session.summary.overallRating === 'Good' && styles.ratingGood,
-                  session.summary.overallRating === 'Developing' && styles.ratingDeveloping,
+                  session.rating === 'Excellent' && styles.ratingExcellent,
+                  session.rating === 'Good' && styles.ratingGood,
+                  session.rating === 'Almost There' && styles.ratingAlmostThere,
+                  session.rating === 'Moderate' && styles.ratingModerate,
+                  session.rating === 'Developing' && styles.ratingDeveloping,
                 ]}>
-                  <Text style={styles.ratingText}>{session.summary.overallRating}</Text>
+                  <Text style={styles.ratingText}>{session.rating}</Text>
                 </View>
               ) : (
                 <Text style={styles.noRating}>—</Text>
@@ -274,8 +276,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#dbeafe',
   },
 
-  ratingDeveloping: {
+  ratingAlmostThere: {
+    backgroundColor: '#e0f2fe',
+  },
+
+  ratingModerate: {
     backgroundColor: '#fef9c3',
+  },
+
+  ratingDeveloping: {
+    backgroundColor: '#fee2e2',
   },
 
   ratingText: {

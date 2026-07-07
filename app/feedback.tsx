@@ -21,15 +21,17 @@ export default function FeedbackScreen() {
   const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string; metricsCount: string }>();
 
   const [summary, setSummary] = useState<SessionSummary | null>(null);
+  const [rating, setRating] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   const sessionIdRef = useRef<string | null>(null);
 
   useEffect(() => {
-    // save session immediately so it appears in history even without a summary
     if (feedbackHistory.length > 0) {
-      sessionIdRef.current = saveSession(drill ?? 'Free Throw', skill ?? '');
+      const { id, rating: computedRating } = saveSession(drill ?? 'Free Throw', skill ?? '');
+      sessionIdRef.current = id;
+      setRating(computedRating);
     }
 
     async function loadSummary() {
@@ -47,7 +49,7 @@ export default function FeedbackScreen() {
           updateSessionSummary(sessionIdRef.current, result);
         }
 
-        const spoken = `Session rating: ${result.overallRating}. ${result.topStrength} ${result.mainFocus} ${result.encouragement}`;
+        const spoken = `${result.topStrength} ${result.mainFocus} ${result.encouragement}`;
         await speak(spoken);
       } catch (err) {
         console.error('Summary error:', err);
@@ -79,10 +81,12 @@ export default function FeedbackScreen() {
         <Text style={styles.error}>{error}</Text>
       ) : summary ? (
         <View style={styles.summaryBox}>
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingLabel}>Overall: </Text>
-            <Text style={styles.ratingValue}>{summary.overallRating}</Text>
-          </View>
+          {rating ? (
+            <View style={styles.ratingRow}>
+              <Text style={styles.ratingLabel}>Overall: </Text>
+              <Text style={styles.ratingValue}>{rating}</Text>
+            </View>
+          ) : null}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Top Strength</Text>
             <Text style={styles.cardText}>{summary.topStrength}</Text>

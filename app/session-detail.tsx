@@ -39,10 +39,12 @@ export default function SessionDetailScreen() {
 
       {session.summary ? (
         <View style={styles.summaryBox}>
-          <View style={styles.ratingRow}>
-            <Text style={styles.ratingLabel}>Overall: </Text>
-            <Text style={styles.ratingValue}>{session.summary.overallRating}</Text>
-          </View>
+          {session.rating ? (
+            <View style={styles.ratingRow}>
+              <Text style={styles.ratingLabel}>Overall: </Text>
+              <Text style={styles.ratingValue}>{session.rating}</Text>
+            </View>
+          ) : null}
           <View style={styles.card}>
             <Text style={styles.cardLabel}>Top Strength</Text>
             <Text style={styles.cardText}>{session.summary.topStrength}</Text>

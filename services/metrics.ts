@@ -69,6 +69,23 @@ export function averageMetrics(metricsList: PoseMetrics[]): PoseMetrics {
   return result;
 }
 
+export type RatingLabel = 'Developing' | 'Moderate' | 'Almost There' | 'Good' | 'Excellent';
+
+export function computeRating(metrics: PoseMetrics): RatingLabel {
+  const display = toDisplayMetrics(metrics);
+  const score = display.reduce((sum, m) => {
+    if (m.status === 'good') return sum + 2;
+    if (m.status === 'warn') return sum + 1;
+    return sum;
+  }, 0);
+
+  if (score <= 2) return 'Developing';
+  if (score <= 4) return 'Moderate';
+  if (score <= 6) return 'Almost There';
+  if (score <= 8) return 'Good';
+  return 'Excellent';
+}
+
 export function generateFakeMetrics(): PoseMetrics {
   return {
     elbowAngle:    Math.round(60 + Math.random() * 40),

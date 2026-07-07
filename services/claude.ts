@@ -54,7 +54,6 @@ Give ONE short coaching tip (1–2 sentences max) that addresses the most import
 }
 
 export interface SessionSummary {
-  overallRating: string;
   topStrength: string;
   mainFocus: string;
   encouragement: string;
@@ -71,7 +70,6 @@ ${feedbackHistory.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
 Based on the tips above, respond ONLY with a JSON object in this exact format:
 {
-  "overallRating": "one word: Excellent / Good / Developing",
   "topStrength": "one sentence about what they did well",
   "mainFocus": "one sentence about the single most important thing to work on next",
   "encouragement": "one short motivating sentence"
