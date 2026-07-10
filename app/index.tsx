@@ -1,7 +1,23 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Button, Text, View } from 'react-native';
 
 export default function HomeScreen() {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem('courtcoach_onboarded').then((value) => {
+      if (!value) {
+        router.replace('/onboarding');
+      } else {
+        setReady(true);
+      }
+    });
+  }, []);
+
+  if (!ready) return null;
+
   return (
     <View
       style={{
@@ -11,22 +27,9 @@ export default function HomeScreen() {
         padding: 20,
       }}
     >
-      <Text
-        style={{
-          fontSize: 36,
-          fontWeight: 'bold',
-        }}
-      >
-        CourtCoach
-      </Text>
+      <Text style={{ fontSize: 36, fontWeight: 'bold' }}>CourtCoach</Text>
 
-      <Text
-        style={{
-          marginVertical: 20,
-          fontSize: 18,
-        }}
-      >
-        
+      <Text style={{ marginVertical: 20, fontSize: 18 }}>
         AI Basketball Coaching
       </Text>
 
