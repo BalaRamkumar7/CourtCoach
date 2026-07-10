@@ -1,13 +1,32 @@
-export interface PoseMetrics {
-  elbowAngle: number;
-  kneeBend: number;
-  releaseHeight: number;
-  balance: number;
-  followThrough: number;
+// All possible metric keys across every drill type
+export type MetricKey =
+  | 'elbowAngle'
+  | 'kneeBend'
+  | 'releaseHeight'
+  | 'balance'
+  | 'followThrough'
+  | 'handPosition'
+  | 'bodyLean';
+
+// PoseMetrics only contains keys relevant to the current drill
+export type PoseMetrics = Partial<Record<MetricKey, number>>;
+
+export interface MetricConfig {
+  label: string;
+  unit: string;
+  idealLabel: string;
+  min: number;
+  max: number;
+  warnMin: number;
+  warnMax: number;
+  fakeMin: number;  // range for fake metric generation
+  fakeMax: number;
 }
 
+export type DrillConfig = Partial<Record<MetricKey, MetricConfig>>;
+
 export interface MetricDisplay {
-  key: keyof PoseMetrics;
+  key: MetricKey;
   label: string;
   value: number;
   unit: string;
@@ -15,83 +34,343 @@ export interface MetricDisplay {
   status: 'good' | 'warn' | 'bad';
 }
 
-export const IDEAL_RANGES = {
-  elbowAngle:    { min: 75,  max: 95,  warnMin: 65,  warnMax: 105 },
-  kneeBend:      { min: 100, max: 130, warnMin: 90,  warnMax: 140 },
-  releaseHeight: { min: 85,  max: 95,  warnMin: 78,  warnMax: 100 },
-  balance:       { min: 75,  max: 100, warnMin: 60,  warnMax: 100 },
-  followThrough: { min: 70,  max: 100, warnMin: 55,  warnMax: 100 },
+export type RatingLabel = 'Developing' | 'Moderate' | 'Almost There' | 'Good' | 'Excellent';
+
+// ─── Drill configurations ────────────────────────────────────────────────────
+
+const DRILL_CONFIGS: Record<string, DrillConfig> = {
+  'Free Throw': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '78–115°',
+      min: 78, max: 115, warnMin: 68, warnMax: 125,
+      fakeMin: 65, fakeMax: 130,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '107–125°',
+      min: 107, max: 125, warnMin: 97, warnMax: 135,
+      fakeMin: 90, fakeMax: 145,
+    },
+    releaseHeight: {
+      label: 'Release Height', unit: '/100', idealLabel: '112–117',
+      min: 112, max: 117, warnMin: 108, warnMax: 122,
+      fakeMin: 100, fakeMax: 125,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '75+',
+      min: 75, max: 100, warnMin: 60, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      min: 65, max: 79, warnMin: 55, warnMax: 89,
+      fakeMin: 45, fakeMax: 95,
+    },
+  },
+
+  'Jump Shot': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '59–65°',
+      min: 59, max: 65, warnMin: 50, warnMax: 75,
+      fakeMin: 45, fakeMax: 85,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '108–110°',
+      min: 108, max: 110, warnMin: 98, warnMax: 120,
+      fakeMin: 90, fakeMax: 130,
+    },
+    releaseHeight: {
+      label: 'Release Height', unit: '/100', idealLabel: '110+',
+      min: 110, max: 125, warnMin: 105, warnMax: 125,
+      fakeMin: 95, fakeMax: 125,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 50, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      min: 65, max: 79, warnMin: 55, warnMax: 89,
+      fakeMin: 45, fakeMax: 95,
+    },
+  },
+
+  '3-Point Shot': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '58–84°',
+      min: 58, max: 84, warnMin: 48, warnMax: 94,
+      fakeMin: 40, fakeMax: 100,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '94–113°',
+      min: 94, max: 113, warnMin: 84, warnMax: 123,
+      fakeMin: 75, fakeMax: 135,
+    },
+    releaseHeight: {
+      label: 'Release Height', unit: '/100', idealLabel: '110+',
+      min: 110, max: 125, warnMin: 105, warnMax: 125,
+      fakeMin: 95, fakeMax: 125,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 50, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      min: 65, max: 79, warnMin: 55, warnMax: 89,
+      fakeMin: 45, fakeMax: 95,
+    },
+  },
+
+  'Layup': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '60–90°',
+      min: 60, max: 90, warnMin: 50, warnMax: 100,
+      fakeMin: 40, fakeMax: 110,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '77–122°',
+      min: 77, max: 122, warnMin: 67, warnMax: 132,
+      fakeMin: 60, fakeMax: 145,
+    },
+    releaseHeight: {
+      label: 'Release Height', unit: '/100', idealLabel: '100+',
+      min: 100, max: 125, warnMin: 90, warnMax: 125,
+      fakeMin: 80, fakeMax: 125,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '65+',
+      min: 65, max: 100, warnMin: 50, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '°', idealLabel: '60–79°',
+      min: 60, max: 79, warnMin: 50, warnMax: 89,
+      fakeMin: 40, fakeMax: 95,
+    },
+  },
+
+  'Chest Pass': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '80–100°',
+      min: 80, max: 100, warnMin: 70, warnMax: 110,
+      fakeMin: 60, fakeMax: 120,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '130–155°',
+      min: 130, max: 155, warnMin: 120, warnMax: 165,
+      fakeMin: 110, fakeMax: 175,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '75+',
+      min: 75, max: 100, warnMin: 60, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 50, fakeMax: 100,
+    },
+  },
+
+  'Bounce Pass': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '80–100°',
+      min: 80, max: 100, warnMin: 70, warnMax: 110,
+      fakeMin: 60, fakeMax: 120,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '130–155°',
+      min: 130, max: 155, warnMin: 120, warnMax: 165,
+      fakeMin: 110, fakeMax: 175,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '75+',
+      min: 75, max: 100, warnMin: 60, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '/100', idealLabel: '65+',
+      min: 65, max: 100, warnMin: 50, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
+    },
+  },
+
+  'Overhead Pass': {
+    elbowAngle: {
+      label: 'Elbow Angle', unit: '°', idealLabel: '85–95°',
+      min: 85, max: 95, warnMin: 75, warnMax: 105,
+      fakeMin: 65, fakeMax: 115,
+    },
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '145–165°',
+      min: 145, max: 165, warnMin: 135, warnMax: 175,
+      fakeMin: 125, fakeMax: 180,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 50, fakeMax: 100,
+    },
+    followThrough: {
+      label: 'Follow-Through', unit: '/100', idealLabel: '75+',
+      min: 75, max: 100, warnMin: 60, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+  },
+
+  'Crossover': {
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '100–130°',
+      min: 100, max: 130, warnMin: 90, warnMax: 140,
+      fakeMin: 80, fakeMax: 155,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '80+',
+      min: 80, max: 100, warnMin: 65, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    handPosition: {
+      label: 'Hand Position', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
+    },
+    bodyLean: {
+      label: 'Body Lean', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
+    },
+  },
+
+  'Between The Legs': {
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '90–110°',
+      min: 90, max: 110, warnMin: 80, warnMax: 120,
+      fakeMin: 70, fakeMax: 135,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '80+',
+      min: 80, max: 100, warnMin: 65, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    handPosition: {
+      label: 'Hand Position', unit: '/100', idealLabel: '65+',
+      min: 65, max: 100, warnMin: 50, warnMax: 100,
+      fakeMin: 40, fakeMax: 100,
+    },
+    bodyLean: {
+      label: 'Body Lean', unit: '/100', idealLabel: '65+',
+      min: 65, max: 100, warnMin: 50, warnMax: 100,
+      fakeMin: 40, fakeMax: 100,
+    },
+  },
+
+  'Ball Handling': {
+    kneeBend: {
+      label: 'Knee Bend', unit: '°', idealLabel: '100–130°',
+      min: 100, max: 130, warnMin: 90, warnMax: 140,
+      fakeMin: 80, fakeMax: 155,
+    },
+    balance: {
+      label: 'Balance', unit: '/100', idealLabel: '80+',
+      min: 80, max: 100, warnMin: 65, warnMax: 100,
+      fakeMin: 55, fakeMax: 100,
+    },
+    handPosition: {
+      label: 'Hand Position', unit: '/100', idealLabel: '75+',
+      min: 75, max: 100, warnMin: 60, warnMax: 100,
+      fakeMin: 50, fakeMax: 100,
+    },
+    bodyLean: {
+      label: 'Body Lean', unit: '/100', idealLabel: '70+',
+      min: 70, max: 100, warnMin: 55, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
+    },
+  },
 };
 
-export const METRIC_LABELS: Record<keyof PoseMetrics, { label: string; unit: string; ideal: string }> = {
-  elbowAngle:    { label: 'Elbow Angle',    unit: '°',    ideal: '75–95°' },
-  kneeBend:      { label: 'Knee Bend',      unit: '°',    ideal: '100–130°' },
-  releaseHeight: { label: 'Release Height', unit: '/100', ideal: '85+' },
-  balance:       { label: 'Balance',        unit: '/100', ideal: '75+' },
-  followThrough: { label: 'Follow-Through', unit: '/100', ideal: '70+' },
-};
+// Fallback config for unknown drills (uses shooting defaults)
+const FALLBACK_CONFIG: DrillConfig = DRILL_CONFIGS['Free Throw'];
 
-function getStatus(key: keyof PoseMetrics, value: number): 'good' | 'warn' | 'bad' {
-  const r = IDEAL_RANGES[key];
-  if (value >= r.min && value <= r.max) return 'good';
-  if (value >= r.warnMin && value <= r.warnMax) return 'warn';
+export function getDrillConfig(drill: string): DrillConfig {
+  return DRILL_CONFIGS[drill] ?? FALLBACK_CONFIG;
+}
+
+// ─── Core functions ──────────────────────────────────────────────────────────
+
+function getStatus(config: MetricConfig, value: number): 'good' | 'warn' | 'bad' {
+  if (value >= config.min && value <= config.max) return 'good';
+  if (value >= config.warnMin && value <= config.warnMax) return 'warn';
   return 'bad';
 }
 
-export function toDisplayMetrics(metrics: PoseMetrics): MetricDisplay[] {
-  return (Object.keys(metrics) as (keyof PoseMetrics)[]).map((key) => {
-    const raw = metrics[key];
-    // releaseHeight is stored as 0.70–0.95, display as 0–100
-    const value = key === 'releaseHeight' ? Math.round(raw * 100) : raw;
-    const meta = METRIC_LABELS[key];
-    return {
-      key,
-      label: meta.label,
-      value,
-      unit: meta.unit,
-      ideal: meta.ideal,
-      status: getStatus(key, value),
-    };
-  });
+export function toDisplayMetrics(metrics: PoseMetrics, drill: string): MetricDisplay[] {
+  const config = getDrillConfig(drill);
+  return (Object.keys(metrics) as MetricKey[])
+    .filter((key) => config[key] !== undefined)
+    .map((key) => {
+      const c = config[key]!;
+      const value = Math.round(metrics[key]!);
+      return {
+        key,
+        label: c.label,
+        value,
+        unit: c.unit,
+        ideal: c.idealLabel,
+        status: getStatus(c, value),
+      };
+    });
 }
 
-export function averageMetrics(metricsList: PoseMetrics[]): PoseMetrics {
-  if (metricsList.length === 0) {
-    return { elbowAngle: 0, kneeBend: 0, releaseHeight: 0, balance: 0, followThrough: 0 };
-  }
-  const keys = Object.keys(metricsList[0]) as (keyof PoseMetrics)[];
-  const result = {} as PoseMetrics;
-  for (const key of keys) {
-    result[key] = Math.round(
-      metricsList.reduce((sum, m) => sum + m[key], 0) / metricsList.length * 10
-    ) / 10;
-  }
-  return result;
-}
-
-export type RatingLabel = 'Developing' | 'Moderate' | 'Almost There' | 'Good' | 'Excellent';
-
-export function computeRating(metrics: PoseMetrics): RatingLabel {
-  const display = toDisplayMetrics(metrics);
+export function computeRating(metrics: PoseMetrics, drill: string): RatingLabel {
+  const display = toDisplayMetrics(metrics, drill);
+  const maxScore = display.length * 2;
   const score = display.reduce((sum, m) => {
     if (m.status === 'good') return sum + 2;
     if (m.status === 'warn') return sum + 1;
     return sum;
   }, 0);
 
-  if (score <= 2) return 'Developing';
-  if (score <= 4) return 'Moderate';
-  if (score <= 6) return 'Almost There';
-  if (score <= 8) return 'Good';
+  // normalize to 0–10 scale regardless of metric count
+  const normalized = maxScore > 0 ? (score / maxScore) * 10 : 0;
+
+  if (normalized <= 2) return 'Developing';
+  if (normalized <= 4) return 'Moderate';
+  if (normalized <= 6) return 'Almost There';
+  if (normalized <= 8) return 'Good';
   return 'Excellent';
 }
 
-export function generateFakeMetrics(): PoseMetrics {
-  return {
-    elbowAngle:    Math.round(60 + Math.random() * 40),
-    kneeBend:      Math.round(95 + Math.random() * 45),
-    releaseHeight: parseFloat((0.7 + Math.random() * 0.25).toFixed(2)),
-    balance:       Math.round(60 + Math.random() * 35),
-    followThrough: Math.round(50 + Math.random() * 50),
-  };
+export function averageMetrics(metricsList: PoseMetrics[]): PoseMetrics {
+  if (metricsList.length === 0) return {};
+  const keys = Object.keys(metricsList[0]) as MetricKey[];
+  const result: PoseMetrics = {};
+  for (const key of keys) {
+    const vals = metricsList.map((m) => m[key] ?? 0);
+    result[key] = Math.round((vals.reduce((a, b) => a + b, 0) / vals.length) * 10) / 10;
+  }
+  return result;
+}
+
+export function generateFakeMetrics(drill: string): PoseMetrics {
+  const config = getDrillConfig(drill);
+  const result: PoseMetrics = {};
+  for (const key of Object.keys(config) as MetricKey[]) {
+    const c = config[key]!;
+    result[key] = Math.round(c.fakeMin + Math.random() * (c.fakeMax - c.fakeMin));
+  }
+  return result;
+}
+
+export function buildPromptMetricsText(metrics: PoseMetrics, drill: string): string {
+  const config = getDrillConfig(drill);
+  return (Object.keys(metrics) as MetricKey[])
+    .filter((key) => config[key])
+    .map((key) => {
+      const c = config[key]!;
+      const value = Math.round(metrics[key]!);
+      return `- ${c.label}: ${value}${c.unit} (ideal: ${c.idealLabel})`;
+    })
+    .join('\n');
 }

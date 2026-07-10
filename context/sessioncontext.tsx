@@ -27,7 +27,7 @@ interface SessionContextType {
   feedbackHistory: string[];
   sessionHistory: SessionRecord[];
   addFeedback: (tip: string, metrics: PoseMetrics) => void;
-  saveSession: (drill: string, skill: string) => { id: string; rating: RatingLabel | null };
+  saveSession: (drill: string, skill: string) => { id: string; rating: RatingLabel | null; avgMetrics: PoseMetrics | null };
   updateSessionSummary: (id: string, summary: SessionSummary) => void;
   resetSession: () => void;
 }
@@ -61,7 +61,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const tips = [...feedbackHistory];
     const metricsList = [...metricsListRef.current];
     const avg = metricsList.length > 0 ? averageMetrics(metricsList) : null;
-    const rating = avg ? computeRating(avg) : null;
+    const rating = avg ? computeRating(avg, drill) : null;
     const record: SessionRecord = {
       id,
       drill,
@@ -77,7 +77,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       persist(updated);
       return updated;
     });
-    return { id, rating };
+    return { id, rating, avgMetrics: avg };
   }
 
   function updateSessionSummary(id: string, summary: SessionSummary) {

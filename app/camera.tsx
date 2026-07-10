@@ -89,7 +89,7 @@ export default function CameraScreen() {
             setShotCount(shotCountRef.current);
           }
 
-          await speak(tip);
+          await speak(tip, () => !activeRef.current);
         } catch (err: any) {
           if (!activeRef.current) break;
           const msg = err?.message ?? String(err);
@@ -132,7 +132,7 @@ export default function CameraScreen() {
     );
   }
 
-  const displayMetrics = liveMetrics ? toDisplayMetrics(liveMetrics) : null;
+  const displayMetrics = liveMetrics ? toDisplayMetrics(liveMetrics, drill ?? 'Free Throw') : null;
 
   return (
     <View style={styles.container}>

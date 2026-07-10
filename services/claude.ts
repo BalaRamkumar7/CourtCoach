@@ -1,4 +1,4 @@
-import { generateFakeMetrics, PoseMetrics } from './metrics';
+import { buildPromptMetricsText, generateFakeMetrics, PoseMetrics } from './metrics';
 
 const API_KEY = process.env.EXPO_PUBLIC_ANTHROPIC_API_KEY;
 const API_URL = 'https://api.anthropic.com/v1/messages';
@@ -11,8 +11,7 @@ export interface TipResult {
 }
 
 export async function getRealtimeTip(drill: string, focus: string = ''): Promise<TipResult> {
-  const metrics = generateFakeMetrics();
-  const releaseDisplay = Math.round(metrics.releaseHeight * 100);
+  const metrics = generateFakeMetrics(drill);
 
   const focusLine = focus
     ? `\nThe player has asked to focus on: "${focus}". Prioritize this in your tip if relevant.`
@@ -21,11 +20,7 @@ export async function getRealtimeTip(drill: string, focus: string = ''): Promise
   const prompt = `You are CourtCoach, an AI basketball coach. The player is performing a ${drill}.${focusLine}
 
 Current body metrics detected:
-- Elbow angle: ${metrics.elbowAngle}° (ideal: 75–95°)
-- Knee bend: ${metrics.kneeBend}° (ideal: 100–130°)
-- Release height: ${releaseDisplay}/100 (ideal: 85+)
-- Balance: ${metrics.balance}/100 (ideal: 75+)
-- Follow-through: ${metrics.followThrough}/100 (ideal: 70+)
+${buildPromptMetricsText(metrics, drill)}
 
 Give ONE short coaching tip (1–2 sentences max) that addresses the most important issue in these metrics. Be specific, encouraging, and use plain language a youth player would understand. Do not mention numbers — translate them into practical advice.`;
 

@@ -1,48 +1,21 @@
 import * as Speech from 'expo-speech';
 
-export async function speak(text: string): Promise<void> {
-  if (!text?.trim()) {
-    console.log('[Speech] Skipping empty text');
-    return;
-  }
+export async function speak(text: string, isCancelled?: () => boolean): Promise<void> {
+  if (!text?.trim()) return;
 
-  console.log('[Speech] Starting speech for text:', text.substring(0, 50));
+  Speech.stop();
 
-  try {
-    await Speech.stop();
-    console.log('[Speech] Previous speech stopped');
-  } catch (e) {
-    console.log('[Speech] Error stopping previous speech:', e);
-  }
+  // Brief gap so the stop settles before we start again.
+  // Check cancellation after the gap so a "Done" press during the wait
+  // prevents speech from starting at all.
+  await new Promise<void>((r) => setTimeout(r, 100));
 
-  await new Promise<void>((resolve) => {
+  if (isCancelled?.()) return;
+
+  return new Promise<void>((resolve) => {
     const estimatedMs = (text.split(' ').length / 2.5) * 1000 + 1500;
-    console.log('[Speech] Estimated duration:', estimatedMs, 'ms');
-    const timeout = setTimeout(() => {
-      console.log('[Speech] Timeout resolved');
-      resolve();
-    }, estimatedMs);
-
-    const done = () => {
-      console.log('[Speech] Speech completed (callback)');
-      clearTimeout(timeout);
-      resolve();
-    };
-
-    try {
-      console.log('[Speech] Calling Speech.speak()');
-      Speech.speak(text, {
-        rate: 1.0,
-        onDone: done,
-        onStopped: done,
-        onError: (error) => {
-          console.error('[Speech] Speech error:', error);
-          done();
-        },
-      });
-    } catch (error) {
-      console.error('[Speech] Failed to start speech:', error);
-      done();
-    }
+    const timeout = setTimeout(resolve, estimatedMs);
+    const done = () => { clearTimeout(timeout); resolve(); };
+    Speech.speak(text, { rate: 1.0, onDone: done, onStopped: done, onError: done });
   });
 }

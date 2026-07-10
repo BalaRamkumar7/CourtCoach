@@ -67,7 +67,7 @@ export default function SessionDetailScreen() {
         <>
           <Text style={styles.tipsTitle}>Average Metrics</Text>
           <View style={styles.metricsBox}>
-            {toDisplayMetrics(session.avgMetrics).map((m) => (
+            {toDisplayMetrics(session.avgMetrics, session.drill).map((m) => (
               <View key={m.key} style={styles.metricRow}>
                 <View style={styles.metricLeft}>
                   <Text style={styles.metricLabel}>{m.label}</Text>

@@ -15,6 +15,13 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { getSessionSummary, SessionSummary } from '../services/claude';
 import { speak } from '../services/speech';
 import { useSession } from '../context/sessioncontext';
+import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
+
+const STATUS_COLOR = {
+  good: '#22c55e',
+  warn: '#f59e0b',
+  bad: '#ef4444',
+};
 
 export default function FeedbackScreen() {
   const { feedbackHistory, saveSession, updateSessionSummary, resetSession } = useSession();
@@ -22,6 +29,7 @@ export default function FeedbackScreen() {
 
   const [summary, setSummary] = useState<SessionSummary | null>(null);
   const [rating, setRating] = useState<string | null>(null);
+  const [avgMetrics, setAvgMetrics] = useState<PoseMetrics | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,9 +37,10 @@ export default function FeedbackScreen() {
 
   useEffect(() => {
     if (feedbackHistory.length > 0) {
-      const { id, rating: computedRating } = saveSession(drill ?? 'Free Throw', skill ?? '');
+      const { id, rating: computedRating, avgMetrics: computed } = saveSession(drill ?? 'Free Throw', skill ?? '');
       sessionIdRef.current = id;
       setRating(computedRating);
+      setAvgMetrics(computed);
     }
 
     async function loadSummary() {
@@ -99,6 +108,25 @@ export default function FeedbackScreen() {
             <Text style={styles.cardText}>{summary.encouragement}</Text>
           </View>
         </View>
+      ) : null}
+
+      {avgMetrics && Object.keys(avgMetrics).length > 0 ? (
+        <>
+          <Text style={styles.historyTitle}>Average Metrics</Text>
+          <View style={styles.metricsBox}>
+            {toDisplayMetrics(avgMetrics, drill ?? 'Free Throw').map((m) => (
+              <View key={m.key} style={styles.metricRow}>
+                <View style={styles.metricLeft}>
+                  <Text style={styles.metricLabel}>{m.label}</Text>
+                  <Text style={styles.metricIdeal}>ideal: {m.ideal}</Text>
+                </View>
+                <Text style={[styles.metricValue, { color: STATUS_COLOR[m.status] }]}>
+                  {m.value}{m.unit}
+                </Text>
+              </View>
+            ))}
+          </View>
+        </>
       ) : null}
 
       <Text style={styles.historyTitle}>
@@ -201,6 +229,42 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 12,
+  },
+
+  metricsBox: {
+    backgroundColor: '#f9fafb',
+    borderRadius: 12,
+    padding: 14,
+    marginBottom: 24,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+
+  metricRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  metricLeft: {
+    gap: 2,
+  },
+
+  metricLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+
+  metricIdeal: {
+    fontSize: 11,
+    color: '#9ca3af',
+  },
+
+  metricValue: {
+    fontSize: 18,
+    fontWeight: '700',
   },
 
   historyItem: {
