@@ -1,7 +1,8 @@
-import { Button, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { router } from 'expo-router';
 import { useSession } from '../context/sessioncontext';
 import { SessionRecord } from '../context/sessioncontext';
+import { C } from '../constants/theme';
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString(undefined, {
@@ -27,22 +28,33 @@ function getDrillBreakdown(sessions: SessionRecord[]) {
 
 function getStreak(sessions: SessionRecord[]) {
   if (sessions.length === 0) return 0;
-  const days = new Set(
-    sessions.map((s) => new Date(s.date).toDateString())
-  );
+  const days = new Set(sessions.map((s) => new Date(s.date).toDateString()));
   let streak = 0;
   const today = new Date();
   for (let i = 0; i < 365; i++) {
     const d = new Date(today);
     d.setDate(today.getDate() - i);
-    if (days.has(d.toDateString())) {
-      streak++;
-    } else {
-      break;
-    }
+    if (days.has(d.toDateString())) streak++;
+    else break;
   }
   return streak;
 }
+
+const RATING_STYLE: Record<string, object> = {
+  Excellent: { backgroundColor: C.successLight },
+  Good: { backgroundColor: C.primaryLight },
+  'Almost There': { backgroundColor: C.skyLight },
+  Moderate: { backgroundColor: C.warningLight },
+  Developing: { backgroundColor: C.dangerLight },
+};
+
+const RATING_TEXT: Record<string, object> = {
+  Excellent: { color: '#166534' },
+  Good: { color: '#1e40af' },
+  'Almost There': { color: '#0369a1' },
+  Moderate: { color: '#854d0e' },
+  Developing: { color: '#991b1b' },
+};
 
 export default function StatsScreen() {
   const { sessionHistory } = useSession();
@@ -53,146 +65,203 @@ export default function StatsScreen() {
   const drillBreakdown = getDrillBreakdown(sessionHistory);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Stats & History</Text>
-      <Button title="← Home" onPress={() => router.push('/')} />
+    <SafeAreaView style={styles.safe}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <TouchableOpacity style={styles.back} onPress={() => router.push('/')}>
+          <Text style={styles.backText}>← Home</Text>
+        </TouchableOpacity>
 
-      {/* Totals */}
-      <View style={styles.statRow}>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{totalSessions}</Text>
-          <Text style={styles.statLabel}>Sessions</Text>
+        <Text style={styles.title}>Stats & History</Text>
+
+        {/* Totals */}
+        <View style={styles.statRow}>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{totalSessions}</Text>
+            <Text style={styles.statLabel}>Sessions</Text>
+          </View>
+          <View style={styles.statBox}>
+            <Text style={styles.statNumber}>{totalTips}</Text>
+            <Text style={styles.statLabel}>Tips Received</Text>
+          </View>
+          <View style={[styles.statBox, styles.streakBox]}>
+            <Text style={[styles.statNumber, styles.streakNumber]}>{streak}</Text>
+            <Text style={[styles.statLabel, { color: '#92400e' }]}>Day Streak 🔥</Text>
+          </View>
         </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{totalTips}</Text>
-          <Text style={styles.statLabel}>Tips Received</Text>
-        </View>
-        <View style={styles.statBox}>
-          <Text style={styles.statNumber}>{streak}</Text>
-          <Text style={styles.statLabel}>Day Streak</Text>
-        </View>
-      </View>
 
-      {/* Per-drill breakdown */}
-      {drillBreakdown.length > 0 ? (
-        <>
-          <Text style={styles.sectionTitle}>Drill Breakdown</Text>
-          {drillBreakdown.map(([drill, data]) => (
-            <View key={drill} style={styles.drillRow}>
-              <Text style={styles.drillName}>{drill}</Text>
-              <View style={styles.drillMeta}>
-                <Text style={styles.drillStat}>{data.count} sessions</Text>
-                <Text style={styles.drillDot}>·</Text>
-                <Text style={styles.drillStat}>{data.tips} tips</Text>
-              </View>
-            </View>
-          ))}
-        </>
-      ) : null}
-
-      {/* Session history */}
-      <Text style={styles.sectionTitle}>Session History</Text>
-
-      {sessionHistory.length === 0 ? (
-        <Text style={styles.empty}>No sessions yet. Complete a drill to see your history here.</Text>
-      ) : (
-        sessionHistory.map((session) => (
-          <TouchableOpacity
-            key={session.id}
-            style={styles.sessionBubble}
-            onPress={() => router.push({ pathname: '/session-detail', params: { id: session.id } })}
-          >
-            <View style={styles.sessionLeft}>
-              <Text style={styles.sessionDrill}>{session.drill}</Text>
-              <Text style={styles.sessionDate}>
-                {formatDate(session.date)} · {formatTime(session.date)}
-              </Text>
-              <Text style={styles.sessionTips}>{session.tips.length} tips</Text>
-            </View>
-            <View style={styles.sessionRight}>
-              {session.rating ? (
-                <View style={[
-                  styles.ratingBadge,
-                  session.rating === 'Excellent' && styles.ratingExcellent,
-                  session.rating === 'Good' && styles.ratingGood,
-                  session.rating === 'Almost There' && styles.ratingAlmostThere,
-                  session.rating === 'Moderate' && styles.ratingModerate,
-                  session.rating === 'Developing' && styles.ratingDeveloping,
-                ]}>
-                  <Text style={styles.ratingText}>{session.rating}</Text>
+        {/* Per-drill breakdown */}
+        {drillBreakdown.length > 0 && (
+          <>
+            <Text style={styles.sectionTitle}>Drill Breakdown</Text>
+            <View style={styles.card}>
+              {drillBreakdown.map(([drill, data], i) => (
+                <View
+                  key={drill}
+                  style={[
+                    styles.drillRow,
+                    i < drillBreakdown.length - 1 && styles.drillRowBorder,
+                  ]}
+                >
+                  <Text style={styles.drillName}>{drill}</Text>
+                  <View style={styles.drillMeta}>
+                    <Text style={styles.drillStat}>{data.count} sessions</Text>
+                    <Text style={styles.drillDot}>·</Text>
+                    <Text style={styles.drillStat}>{data.tips} tips</Text>
+                  </View>
                 </View>
-              ) : (
-                <Text style={styles.noRating}>—</Text>
-              )}
-              <Text style={styles.chevron}>›</Text>
+              ))}
             </View>
-          </TouchableOpacity>
-        ))
-      )}
-    </ScrollView>
+          </>
+        )}
+
+        {/* Session history */}
+        <Text style={styles.sectionTitle}>Session History</Text>
+
+        {sessionHistory.length === 0 ? (
+          <View style={styles.emptyBox}>
+            <Text style={styles.emptyEmoji}>🏀</Text>
+            <Text style={styles.emptyText}>No sessions yet.</Text>
+            <Text style={styles.emptyHint}>Complete a drill to see your history here.</Text>
+          </View>
+        ) : (
+          sessionHistory.map((session) => (
+            <TouchableOpacity
+              key={session.id}
+              style={styles.sessionBubble}
+              onPress={() => router.push({ pathname: '/session-detail', params: { id: session.id } })}
+              activeOpacity={0.8}
+            >
+              <View style={styles.sessionLeft}>
+                <Text style={styles.sessionDrill}>{session.drill}</Text>
+                <Text style={styles.sessionDate}>
+                  {formatDate(session.date)} · {formatTime(session.date)}
+                </Text>
+                <Text style={styles.sessionTips}>{session.tips.length} tips received</Text>
+              </View>
+              <View style={styles.sessionRight}>
+                {session.rating ? (
+                  <View style={[styles.ratingBadge, RATING_STYLE[session.rating]]}>
+                    <Text style={[styles.ratingText, RATING_TEXT[session.rating]]}>
+                      {session.rating}
+                    </Text>
+                  </View>
+                ) : (
+                  <Text style={styles.noRating}>—</Text>
+                )}
+                <Text style={styles.chevron}>›</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: C.bg,
+  },
+
   container: {
-    padding: 20,
+    padding: 24,
     paddingBottom: 60,
+  },
+
+  back: {
+    marginBottom: 20,
+  },
+
+  backText: {
+    fontSize: 16,
+    color: C.primary,
+    fontWeight: '600',
   },
 
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
+    fontWeight: '800',
+    color: C.text,
+    letterSpacing: -0.5,
     marginBottom: 24,
   },
 
   statRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     marginBottom: 32,
   },
 
   statBox: {
     flex: 1,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: C.card,
     borderRadius: 14,
     padding: 16,
     alignItems: 'center',
     gap: 4,
+    borderWidth: 1,
+    borderColor: C.border,
+  },
+
+  streakBox: {
+    backgroundColor: '#fffbeb',
+    borderColor: '#fde68a',
   },
 
   statNumber: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#111',
+    fontWeight: '800',
+    color: C.text,
+  },
+
+  streakNumber: {
+    color: '#92400e',
   },
 
   statLabel: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontWeight: '500',
+    fontSize: 11,
+    color: C.textSecondary,
+    fontWeight: '600',
     textAlign: 'center',
+    textTransform: 'uppercase',
+    letterSpacing: 0.4,
   },
 
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
+    color: C.text,
     marginBottom: 12,
     marginTop: 8,
+  },
+
+  card: {
+    backgroundColor: C.card,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: C.border,
+    marginBottom: 24,
+    overflow: 'hidden',
   },
 
   drillRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+  },
+
+  drillRowBorder: {
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
+    borderBottomColor: C.borderLight,
   },
 
   drillName: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#111',
+    color: C.text,
   },
 
   drillMeta: {
@@ -203,31 +272,46 @@ const styles = StyleSheet.create({
 
   drillStat: {
     fontSize: 13,
-    color: '#6b7280',
+    color: C.textSecondary,
   },
 
   drillDot: {
-    color: '#d1d5db',
+    color: C.textTertiary,
   },
 
-  empty: {
-    fontSize: 15,
-    color: '#9ca3af',
+  emptyBox: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    gap: 8,
+  },
+
+  emptyEmoji: {
+    fontSize: 40,
+    marginBottom: 4,
+  },
+
+  emptyText: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: C.text,
+  },
+
+  emptyHint: {
+    fontSize: 14,
+    color: C.textSecondary,
     textAlign: 'center',
-    marginTop: 20,
-    lineHeight: 22,
   },
 
   sessionBubble: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: C.card,
     borderRadius: 14,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
+    borderColor: C.border,
     shadowColor: '#000',
     shadowOpacity: 0.04,
     shadowRadius: 4,
@@ -242,17 +326,18 @@ const styles = StyleSheet.create({
   sessionDrill: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#111',
+    color: C.text,
   },
 
   sessionDate: {
     fontSize: 13,
-    color: '#6b7280',
+    color: C.textSecondary,
   },
 
   sessionTips: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: C.textTertiary,
+    marginTop: 1,
   },
 
   sessionRight: {
@@ -263,44 +348,22 @@ const styles = StyleSheet.create({
 
   ratingBadge: {
     paddingHorizontal: 10,
-    paddingVertical: 4,
+    paddingVertical: 5,
     borderRadius: 20,
-    backgroundColor: '#e5e7eb',
-  },
-
-  ratingExcellent: {
-    backgroundColor: '#dcfce7',
-  },
-
-  ratingGood: {
-    backgroundColor: '#dbeafe',
-  },
-
-  ratingAlmostThere: {
-    backgroundColor: '#e0f2fe',
-  },
-
-  ratingModerate: {
-    backgroundColor: '#fef9c3',
-  },
-
-  ratingDeveloping: {
-    backgroundColor: '#fee2e2',
   },
 
   ratingText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#374151',
   },
 
   noRating: {
     fontSize: 18,
-    color: '#d1d5db',
+    color: C.textTertiary,
   },
 
   chevron: {
     fontSize: 20,
-    color: '#9ca3af',
+    color: C.textTertiary,
   },
 });

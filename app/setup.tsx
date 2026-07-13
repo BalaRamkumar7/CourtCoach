@@ -1,17 +1,17 @@
 import { useState } from 'react';
-
 import {
-  Button,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native';
-
 import { router, useLocalSearchParams } from 'expo-router';
+import { C } from '../constants/theme';
 
 export default function SetupScreen() {
   const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string }>();
@@ -34,77 +34,114 @@ export default function SetupScreen() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
-      <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.drill}>{drill}</Text>
-        <Text style={styles.title}>Set Up Your Session</Text>
+    <SafeAreaView style={styles.safe}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+          <TouchableOpacity style={styles.back} onPress={() => router.back()}>
+            <Text style={styles.backText}>← Back</Text>
+          </TouchableOpacity>
 
-        <View style={styles.section}>
-          <Text style={styles.label}>Focus Area (optional)</Text>
-          <Text style={styles.hint}>
-            What do you want to work on? e.g. "follow through" or "keep my elbow in"
-          </Text>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Type your focus here..."
-            value={focus}
-            onChangeText={setFocus}
-            multiline
-            returnKeyType="done"
-          />
-        </View>
+          <Text style={styles.drillLabel}>{drill}</Text>
+          <Text style={styles.title}>Set Up Your Session</Text>
 
-        <View style={styles.section}>
-          {isShooting ? (
-            <>
-              <Text style={styles.label}>Number of Shots</Text>
-              <TextInput
-                style={styles.numberInput}
-                value={shots}
-                onChangeText={setShots}
-                keyboardType="number-pad"
-                maxLength={3}
-              />
-            </>
-          ) : (
-            <>
-              <Text style={styles.label}>Session Duration (minutes)</Text>
-              <TextInput
-                style={styles.numberInput}
-                value={duration}
-                onChangeText={setDuration}
-                keyboardType="number-pad"
-                maxLength={2}
-              />
-            </>
-          )}
-        </View>
+          {/* Focus area */}
+          <View style={styles.section}>
+            <Text style={styles.label}>Focus Area</Text>
+            <Text style={styles.hint}>
+              What do you want to work on? e.g. "follow through" or "keep my elbow in"
+            </Text>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Optional — type your focus here..."
+              placeholderTextColor={C.textTertiary}
+              value={focus}
+              onChangeText={setFocus}
+              multiline
+              returnKeyType="done"
+            />
+          </View>
 
-        <Button title="Start Session" onPress={handleStart} />
-      </ScrollView>
-    </KeyboardAvoidingView>
+          {/* Shot / duration limit */}
+          <View style={styles.section}>
+            <Text style={styles.label}>
+              {isShooting ? 'Number of Shots' : 'Session Duration (minutes)'}
+            </Text>
+            <View style={styles.counterRow}>
+              <TouchableOpacity
+                style={styles.counterBtn}
+                onPress={() => {
+                  if (isShooting) setShots((v) => String(Math.max(1, parseInt(v) - 1)));
+                  else setDuration((v) => String(Math.max(1, parseInt(v) - 1)));
+                }}
+              >
+                <Text style={styles.counterBtnText}>−</Text>
+              </TouchableOpacity>
+              <Text style={styles.counterValue}>
+                {isShooting ? shots : duration}
+              </Text>
+              <TouchableOpacity
+                style={styles.counterBtn}
+                onPress={() => {
+                  if (isShooting) setShots((v) => String(Math.min(99, parseInt(v) + 1)));
+                  else setDuration((v) => String(Math.min(60, parseInt(v) + 1)));
+                }}
+              >
+                <Text style={styles.counterBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.counterHint}>
+              {isShooting ? 'shots' : 'minutes'}
+            </Text>
+          </View>
+
+          <TouchableOpacity style={styles.startBtn} onPress={handleStart} activeOpacity={0.85}>
+            <Text style={styles.startBtnText}>Start Session</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: C.bg,
+  },
+
   container: {
     padding: 24,
     paddingBottom: 60,
-    gap: 24,
+    gap: 28,
   },
 
-  drill: {
+  back: {
+    marginBottom: 4,
+  },
+
+  backText: {
     fontSize: 16,
-    color: '#6b7280',
-    fontWeight: '500',
+    color: C.primary,
+    fontWeight: '600',
+  },
+
+  drillLabel: {
+    fontSize: 14,
+    color: C.textSecondary,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    marginBottom: -16,
   },
 
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontWeight: '800',
+    color: C.text,
+    letterSpacing: -0.5,
   },
 
   section: {
@@ -113,32 +150,78 @@ const styles = StyleSheet.create({
 
   label: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: C.text,
   },
 
   hint: {
     fontSize: 13,
-    color: '#6b7280',
+    color: C.textSecondary,
+    lineHeight: 18,
   },
 
   textInput: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 10,
-    padding: 12,
+    borderWidth: 1.5,
+    borderColor: C.border,
+    borderRadius: 12,
+    padding: 14,
     fontSize: 16,
-    minHeight: 80,
+    color: C.text,
+    minHeight: 90,
     textAlignVertical: 'top',
+    backgroundColor: C.card,
   },
 
-  numberInput: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 10,
-    padding: 12,
+  counterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 20,
+    marginTop: 4,
+  },
+
+  counterBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: C.card,
+    borderWidth: 1.5,
+    borderColor: C.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  counterBtnText: {
     fontSize: 24,
-    fontWeight: '600',
-    width: 100,
+    color: C.text,
+    fontWeight: '500',
+    lineHeight: 28,
+  },
+
+  counterValue: {
+    fontSize: 40,
+    fontWeight: '800',
+    color: C.text,
+    minWidth: 64,
     textAlign: 'center',
+  },
+
+  counterHint: {
+    fontSize: 14,
+    color: C.textSecondary,
+    marginTop: -4,
+  },
+
+  startBtn: {
+    backgroundColor: C.primary,
+    borderRadius: 16,
+    paddingVertical: 18,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
+  startBtnText: {
+    color: C.white,
+    fontSize: 18,
+    fontWeight: '700',
   },
 });
