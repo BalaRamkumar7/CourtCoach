@@ -10,8 +10,8 @@ export interface TipResult {
   metrics: PoseMetrics;
 }
 
-export async function getRealtimeTip(drill: string, focus: string = ''): Promise<TipResult> {
-  const metrics = generateFakeMetrics(drill);
+export async function getRealtimeTip(drill: string, focus: string = '', liveMetrics?: PoseMetrics): Promise<TipResult> {
+  const metrics = liveMetrics ?? generateFakeMetrics(drill);
 
   const focusLine = focus
     ? `\nThe player has asked to focus on: "${focus}". Prioritize this in your tip if relevant.`
