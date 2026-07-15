@@ -18,6 +18,7 @@ import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
 import PoseCamera from '../components/PoseCamera';
 
 const PAUSE_BETWEEN_TIPS_MS = 3000;
+const SCAN_DELAY_MS = 4000; // time to let camera + pose model initialise before first tip
 
 const STATUS_COLOR = {
   good: '#22c55e',
@@ -28,6 +29,7 @@ const STATUS_COLOR = {
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
   const [feedback, setFeedback]         = useState('');
+  const [isScanning, setIsScanning]     = useState(true);
   const [isAnalyzing, setIsAnalyzing]   = useState(false);
   const [apiError, setApiError]         = useState('');
   const [shotCount, setShotCount]       = useState(0);
@@ -65,6 +67,11 @@ export default function CameraScreen() {
     shotCountRef.current = 0;
 
     async function coachingLoop() {
+      // Wait for camera + MediaPipe to initialise before firing the first tip
+      setIsScanning(true);
+      await new Promise((r) => setTimeout(r, SCAN_DELAY_MS));
+      setIsScanning(false);
+
       while (activeRef.current) {
         if (maxDurationMs && Date.now() - startTimeRef.current >= maxDurationMs) {
           navigateToFeedback(); break;
@@ -172,7 +179,12 @@ export default function CameraScreen() {
         ) : null}
 
         {/* Tip overlay */}
-        {isAnalyzing ? (
+        {isScanning ? (
+          <View style={styles.feedbackOverlay}>
+            <ActivityIndicator color="white" />
+            <Text style={styles.feedbackText}>Scanning body points…</Text>
+          </View>
+        ) : isAnalyzing ? (
           <View style={styles.feedbackOverlay}>
             <ActivityIndicator color="white" />
             <Text style={styles.feedbackText}>Analyzing…</Text>
@@ -245,7 +257,12 @@ export default function CameraScreen() {
         </View>
       ) : null}
 
-      {isAnalyzing ? (
+      {isScanning ? (
+        <View style={styles.feedbackOverlay}>
+          <ActivityIndicator color="white" />
+          <Text style={styles.feedbackText}>Scanning body points…</Text>
+        </View>
+      ) : isAnalyzing ? (
         <View style={styles.feedbackOverlay}>
           <ActivityIndicator color="white" />
           <Text style={styles.feedbackText}>Analyzing…</Text>

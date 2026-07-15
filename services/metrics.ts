@@ -222,9 +222,9 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
 
   'Crossover': {
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '100–130°',
-      min: 100, max: 130, warnMin: 90, warnMax: 140,
-      fakeMin: 80, fakeMax: 155,
+      label: 'Knee Bend', unit: '°', idealLabel: '100–133°',
+      min: 100, max: 133, warnMin: 90, warnMax: 143,
+      fakeMin: 80, fakeMax: 158,
     },
     balance: {
       label: 'Balance', unit: '/100', idealLabel: '80+',
@@ -268,9 +268,9 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
 
   'Ball Handling': {
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '100–130°',
-      min: 100, max: 130, warnMin: 90, warnMax: 140,
-      fakeMin: 80, fakeMax: 155,
+      label: 'Knee Bend', unit: '°', idealLabel: '100–133°',
+      min: 100, max: 133, warnMin: 90, warnMax: 143,
+      fakeMin: 80, fakeMax: 158,
     },
     balance: {
       label: 'Balance', unit: '/100', idealLabel: '80+',
