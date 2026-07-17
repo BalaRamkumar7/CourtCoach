@@ -61,7 +61,7 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 55, fakeMax: 100,
     },
     followThrough: {
-      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      label: 'Follow-Through', unit: '/100', idealLabel: '65–79',
       min: 65, max: 79, warnMin: 55, warnMax: 89,
       fakeMin: 45, fakeMax: 95,
     },
@@ -69,14 +69,14 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
 
   'Jump Shot': {
     elbowAngle: {
-      label: 'Elbow Angle', unit: '°', idealLabel: '59–65°',
-      min: 59, max: 65, warnMin: 50, warnMax: 75,
-      fakeMin: 45, fakeMax: 85,
+      label: 'Elbow Angle', unit: '°', idealLabel: '45–80°',
+      min: 45, max: 80, warnMin: 30, warnMax: 95,
+      fakeMin: 30, fakeMax: 100,
     },
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '108–110°',
-      min: 108, max: 110, warnMin: 98, warnMax: 120,
-      fakeMin: 90, fakeMax: 130,
+      label: 'Knee Bend', unit: '°', idealLabel: '100–125°',
+      min: 100, max: 125, warnMin: 90, warnMax: 135,
+      fakeMin: 85, fakeMax: 140,
     },
     releaseHeight: {
       label: 'Release Height', unit: '/100', idealLabel: '110+',
@@ -89,7 +89,7 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 50, fakeMax: 100,
     },
     followThrough: {
-      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      label: 'Follow-Through', unit: '/100', idealLabel: '65–79',
       min: 65, max: 79, warnMin: 55, warnMax: 89,
       fakeMin: 45, fakeMax: 95,
     },
@@ -102,9 +102,9 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 40, fakeMax: 100,
     },
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '94–113°',
-      min: 94, max: 113, warnMin: 84, warnMax: 123,
-      fakeMin: 75, fakeMax: 135,
+      label: 'Knee Bend', unit: '°', idealLabel: '100–122°',
+      min: 100, max: 122, warnMin: 90, warnMax: 130,
+      fakeMin: 80, fakeMax: 138,
     },
     releaseHeight: {
       label: 'Release Height', unit: '/100', idealLabel: '110+',
@@ -117,7 +117,7 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 50, fakeMax: 100,
     },
     followThrough: {
-      label: 'Follow-Through', unit: '°', idealLabel: '65–79°',
+      label: 'Follow-Through', unit: '/100', idealLabel: '65–79',
       min: 65, max: 79, warnMin: 55, warnMax: 89,
       fakeMin: 45, fakeMax: 95,
     },
@@ -145,7 +145,7 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 45, fakeMax: 100,
     },
     followThrough: {
-      label: 'Follow-Through', unit: '°', idealLabel: '60–79°',
+      label: 'Follow-Through', unit: '/100', idealLabel: '60–79',
       min: 60, max: 79, warnMin: 50, warnMax: 89,
       fakeMin: 40, fakeMax: 95,
     },
@@ -204,9 +204,9 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       fakeMin: 65, fakeMax: 115,
     },
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '145–165°',
-      min: 145, max: 165, warnMin: 135, warnMax: 175,
-      fakeMin: 125, fakeMax: 180,
+      label: 'Knee Bend', unit: '°', idealLabel: '130–155°',
+      min: 130, max: 155, warnMin: 120, warnMax: 165,
+      fakeMin: 110, fakeMax: 175,
     },
     balance: {
       label: 'Balance', unit: '/100', idealLabel: '70+',
@@ -245,9 +245,9 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
 
   'Between The Legs': {
     kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '90–110°',
-      min: 90, max: 110, warnMin: 80, warnMax: 120,
-      fakeMin: 70, fakeMax: 135,
+      label: 'Knee Bend', unit: '°', idealLabel: '100–133°',
+      min: 100, max: 133, warnMin: 90, warnMax: 143,
+      fakeMin: 80, fakeMax: 158,
     },
     balance: {
       label: 'Balance', unit: '/100', idealLabel: '80+',
