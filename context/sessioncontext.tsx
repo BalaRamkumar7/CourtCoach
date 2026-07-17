@@ -56,7 +56,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     metricsListRef.current.push(metrics);
   }
 
-  function saveSession(drill: string, skill: string): { id: string; rating: RatingLabel | null } {
+  function saveSession(drill: string, skill: string): { id: string; rating: RatingLabel | null; avgMetrics: PoseMetrics | null } {
     const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const tips = [...feedbackHistory];
     const metricsList = [...metricsListRef.current];
