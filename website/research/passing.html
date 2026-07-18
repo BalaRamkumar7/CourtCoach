@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>What Makes a Clean Pass — CourtCoach Research</title>
+<style>
+  :root{
+    --bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;
+    --muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;
+    --accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;
+    --f-display:"Arial Narrow","Helvetica Neue",Helvetica,system-ui,sans-serif;
+    --f-body:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;
+    --muted:#ADA595;--faint:#726B5C;--line:#2C261D;
+    --accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;
+  }}
+  :root[data-theme="dark"]{--bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;--muted:#ADA595;--faint:#726B5C;--line:#2C261D;--accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;}
+  :root[data-theme="light"]{--bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;--muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;--accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.68;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent-deep);}
+  .eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .nav-in{max-width:1080px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;}
+  .brand{display:flex;align-items:center;gap:.55rem;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:1.15rem;text-decoration:none;color:var(--ink);}
+  .brand .mark{width:20px;height:20px;border-radius:50%;background:var(--accent);position:relative;flex:none;}
+  .brand .mark::before,.brand .mark::after{content:"";position:absolute;background:var(--bg);opacity:.9;}
+  .brand .mark::before{left:50%;top:0;width:1.3px;height:100%;transform:translateX(-50%);}
+  .brand .mark::after{top:50%;left:0;height:1.3px;width:100%;transform:translateY(-50%);}
+  .brand b{color:var(--accent);}
+  .nav-back{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+  .nav-back:hover{color:var(--accent);}
+  .wrap{max-width:46rem;margin:0 auto;padding:0 1.5rem;}
+  article{padding:clamp(2.5rem,6vw,4.5rem) 0 4rem;}
+  .crumb{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:1.4rem;}
+  .crumb a{color:var(--accent);text-decoration:none;}
+  h1{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:clamp(2.6rem,6vw,4.2rem);line-height:.94;letter-spacing:.005em;margin:.6rem 0 0;}
+  .dek{font-size:1.25rem;color:var(--muted);margin:1.3rem 0 0;line-height:1.5;}
+  .byline{display:flex;flex-wrap:wrap;gap:1.2rem;margin:1.8rem 0 0;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);}
+  .byline .status{display:inline-flex;align-items:center;gap:.4rem;color:var(--accent);}
+  .byline .status .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .abstract{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:1.4rem 1.5rem;margin:2.2rem 0;}
+  .abstract .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.5rem;}
+  .toc{margin:2.2rem 0;padding:1.2rem 1.4rem;border:1px dashed var(--line);border-radius:10px;}
+  .toc .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);}
+  .toc ol{margin:.6rem 0 0;padding-left:1.2rem;font-family:var(--f-mono);font-size:.85rem;line-height:1.9;}
+  .toc a{color:var(--ink);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  h2{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:1.9rem;line-height:1.05;letter-spacing:.01em;margin:3rem 0 .3rem;scroll-margin-top:5rem;}
+  .h2num{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);letter-spacing:.1em;}
+  p{font-size:1.13rem;margin:1rem 0;}
+  .ph{border-left:2px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent);padding:.7rem 1rem;margin:1rem 0;border-radius:0 6px 6px 0;}
+  .ph .tag{font-family:var(--f-mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.35rem;}
+  .ph p{font-style:italic;color:var(--muted);font-size:1rem;margin:.3rem 0;}
+  .greek{color:var(--faint);}
+  table.metrics{width:100%;border-collapse:collapse;margin:1.3rem 0;font-family:var(--f-mono);font-size:.86rem;}
+  table.metrics caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:.6rem;}
+  table.metrics th,table.metrics td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);}
+  table.metrics thead th{color:var(--faint);font-weight:700;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;border-bottom:1.5px solid var(--line);}
+  table.metrics td.val{color:var(--accent-deep);font-weight:600;}
+  .tbl-wrap{overflow-x:auto;}
+  figure.fig{margin:1.6rem 0;}
+  .fig-ph{border:1px dashed var(--line);border-radius:10px;background:var(--surface-2);min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:1.5rem;}
+  figcaption{font-family:var(--f-mono);font-size:.74rem;color:var(--faint);margin-top:.6rem;}
+  figcaption b{color:var(--accent);}
+  .note{border:1px solid var(--line);border-radius:10px;padding:1rem 1.2rem;margin:1.6rem 0;background:var(--surface);}
+  .note .lbl{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .note p{font-size:1rem;margin:.4rem 0 0;color:var(--muted);}
+  .refs{margin-top:3.5rem;padding-top:1.6rem;border-top:2px solid var(--ink);}
+  .refs h2{margin-top:0;}
+  ol.reflist{list-style:none;counter-reset:r;margin:1.2rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem;}
+  ol.reflist li{counter-increment:r;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;font-size:.94rem;line-height:1.45;}
+  ol.reflist li::before{content:"P" counter(r);font-family:var(--f-mono);font-size:.76rem;color:var(--accent);font-weight:700;padding-top:.15rem;}
+  ol.reflist a{color:var(--accent-deep);text-decoration:none;}
+  ol.reflist a:hover{text-decoration:underline;}
+  ol.reflist .tag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:3px;padding:.05rem .35rem;margin-left:.35rem;white-space:nowrap;}
+  ol.reflist .supp{color:var(--muted);font-style:italic;}
+  footer{border-top:1px solid var(--line);padding:2rem 0 3rem;}
+  .foot-note{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span> Court<b>Coach</b></a>
+    <a class="nav-back" href="index.html">← All research</a>
+  </div>
+</header>
+
+<article>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Research</a> / Passing</div>
+    <span class="eyebrow">Passing · Research</span>
+    <h1>What Makes a Clean Pass</h1>
+    <p class="dek">Chest, bounce, and overhead passes — the mechanics coaches teach, what CourtCoach measures, and a clear-eyed account of where the evidence backs it up.</p>
+    <div class="byline">
+      <span class="status"><span class="dot"></span> Draft</span>
+      <span>July 2026</span>
+      <span>7 sources</span>
+    </div>
+
+    <div class="abstract">
+      <span class="lbl">Abstract</span>
+      <p style="margin:0;">Passing is the honest counterweight to shooting. Where a shot has been motion-captured for decades, passing has barely been studied at all &mdash; the only basketball-passing-specific study we could find measures how fast the arms move, not the angles they reach [P1]. As a result, almost every passing target in CourtCoach is an engineering estimate built from coaching consensus rather than a measured number. This paper covers the chest, bounce and overhead passes, explains why their ranges look the way they do, and documents the one clear, evidence-based correction the audit produced: fixing an overhead-pass knee range that had the mechanics backwards.</p>
+    </div>
+
+    <div class="toc">
+      <span class="lbl">Contents</span>
+      <ol>
+        <li><a href="#intro">The state of passing research</a></li>
+        <li><a href="#chest">Chest Pass</a></li>
+        <li><a href="#bounce">Bounce Pass</a></li>
+        <li><a href="#overhead">Overhead Pass</a></li>
+        <li><a href="#limits">Limitations &amp; open questions</a></li>
+      </ol>
+    </div>
+
+    <h2 id="intro"><span class="h2num">01 /</span> The state of passing research</h2>
+    <div class="note">
+      <span class="lbl">Honest framing</span>
+      <p>The only basketball-passing-specific peer-reviewed study we found (P1) measures angular <em>velocity</em>, not release-angle degrees. No source anywhere quantifies a target elbow or knee angle for a chest, bounce, or overhead pass. Treat the numbers below as engineering estimates, not research-derived targets.</p>
+    </div>
+    <p>Why is passing so much thinner than shooting? Partly because it is harder to isolate. A shot ends at a single, well-defined release; a pass is a quick push whose &ldquo;release&rdquo; is smeared across a few frames, and its power comes as much from the legs and torso as the arms. The researchers who have looked at passing have tended to measure angular velocity or the effect of fatigue rather than a target joint angle at release [P1]. CourtCoach still measures what it can &mdash; elbow and knee angle at the sampled frame, plus balance and follow-through as 0&ndash;100 scores &mdash; but the framing above should stay in mind for every number that follows.</p>
+
+    <h2 id="chest"><span class="h2num">02 /</span> Chest Pass</h2>
+    <p>The chest pass is the reference against which the other two are set. Its elbow target of 80&ndash;100&deg; comes from coaching description rather than measurement, and there is a real tension worth naming: sources describe a good chest pass as ending in near-full elbow extension &mdash; a single &ldquo;delivery point&rdquo; with the arms almost straight [P3, P4]. Under CourtCoach's convention, where 180&deg; is a straight arm, a true release frame should therefore read much higher than 80&ndash;100&deg;. The likeliest explanation is sampling timing &mdash; the app catches a bent mid-push frame rather than the extended release &mdash; which makes this a measurement question more than a wrong target. The knee range of 130&ndash;155&deg; is a lightly-braced athletic stance, borrowed from general stance research since no passing-specific figure exists [P2].</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Chest Pass</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">80–100°</td><td>70–110°</td><td>Estimate, P3 P4</td></tr>
+          <tr><td>Knee Bend</td><td class="val">130–155°</td><td>120–165°</td><td>Estimate, P2</td></tr>
+          <tr><td>Balance</td><td class="val">75+</td><td>60+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">70+ /100</td><td>55+</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="fig">
+      <div class="fig-ph">[ Figure placeholder — e.g. chest-pass release with elbow extension ]</div>
+      <figcaption><b>Figure 1.</b> A chest pass at its delivery point: elbows extending toward a single release, weight driving forward off a braced stance. [Replace with a real annotated frame.]</figcaption>
+    </figure>
+
+    <h2 id="bounce"><span class="h2num">03 /</span> Bounce Pass</h2>
+    <p>The bounce pass carries the same elbow and knee targets as the chest pass &mdash; deliberately. No source we found differentiates the two on joint angle; what actually separates them is where the ball is aimed and how high it is released, a trajectory difference rather than a stance difference. CourtCoach doesn't yet track release height for passes, so the quantity it does measure looks identical to the chest pass &mdash; and honestly should, until there is an evidence-grounded reason to split them. The one small difference, a slightly lower follow-through floor, reflects that a bounce pass finishes downward rather than straight out.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Bounce Pass</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">80–100°</td><td>70–110°</td><td>Estimate</td></tr>
+          <tr><td>Knee Bend</td><td class="val">130–155°</td><td>120–165°</td><td>Estimate</td></tr>
+          <tr><td>Balance</td><td class="val">75+</td><td>60+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">65+ /100</td><td>50+</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="overhead"><span class="h2num">04 /</span> Overhead Pass</h2>
+    <p>The overhead pass is where the audit found its one clear passing error. CourtCoach used to ask for a straighter-legged stance here &mdash; a knee range of 145&ndash;165&deg; &mdash; than for the chest or bounce pass, implying the overhead pass is thrown with less bend. Nothing supports that. Every source describing the overhead or outlet pass uses the same &ldquo;bend your knees for a strong base&rdquo; cue as the other passes, and several emphasize generating <em>more</em> power through the legs on a long outlet, not less [P5, P6, P7]. The straighter-stance assumption had the mechanics backwards, so we unified the range to 130&ndash;155&deg; to match the chest and bounce pass. It remains an estimate &mdash; but at least a consistent one.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Overhead Pass</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">85–95°</td><td>75–105°</td><td>Estimate</td></tr>
+          <tr><td>Knee Bend</td><td class="val">130–155°</td><td>120–165°</td><td>Corrected, P5 P6 P7</td></tr>
+          <tr><td>Balance</td><td class="val">70+</td><td>55+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">75+ /100</td><td>60+</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="limits"><span class="h2num">05 /</span> Limitations &amp; open questions</h2>
+    <p>It has to be said plainly: almost none of the numbers in this paper are research-validated. They are coaching consensus translated into ranges, and they should be read that way. Two things would move them from estimate toward evidence. The first is a genuine passing-kinematics dataset &mdash; measured release-frame angles for each pass type, which currently does not exist. The second is internal: adding release-height tracking for passes would let CourtCoach capture the trajectory difference that actually distinguishes a bounce pass from a chest pass, instead of leaning on identical joint angles. Until then, the passing model is best understood as a careful set of defaults, not a finding.</p>
+    <div class="note">
+      <span class="lbl">Methods note</span>
+      <p>Every target range on this page is the live value from CourtCoach's current build, and each verdict traces to the sources listed below. For the full method and the verdict on all 44 metrics across every skill, see the <a href="methodology.html">methodology paper</a>.</p>
+    </div>
+
+    <section class="refs">
+      <h2>References</h2>
+      <ol class="reflist">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7830610/" target="_blank" rel="noopener">Influence of Fatigue on Kinematic Parameters of Basketball Passing (IJERPH 18(2):700, 2021)</a><span class="tag">Study</span><br><span class="supp">Only passing-specific peer-reviewed kinematics study found; reports angular velocity, not release-angle degrees.</span></li>
+        <li><a href="https://www.researchgate.net/publication/299594283" target="_blank" rel="noopener">Influence of Athletic Stance Height/Width on Response Time in Basketball (ResearchGate)</a><span class="tag">Study</span><br><span class="supp">General stance knee-flexion data — closest proxy for passing knee-bend plausibility.</span></li>
+        <li><a href="https://pgcbasketball.com/blog/key-basketball-skill-bent-elbow-pass/" target="_blank" rel="noopener">Basketball Passing Skill: Bent Elbow Pass (PGC Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Standard chest pass ends in a full-extension delivery point.</span></li>
+        <li><a href="https://hoopstudent.com/basketball-chest-pass/" target="_blank" rel="noopener">Chest Pass in Basketball: General Information (HoopStudent)</a><span class="tag">Coaching</span><br><span class="supp">Elbows straighten from a bent start at release.</span></li>
+        <li><a href="https://www.sportplan.net/drills/Basketball/Passing-Technique/Body-Position-for-Passing-Basket115.jsp" target="_blank" rel="noopener">Body Position for Passing (Sportplan)</a><span class="tag">Coaching</span><br><span class="supp">Generic "bend your knees" cue applied undifferentiated across pass types.</span></li>
+        <li><a href="https://hoopsking.com/blogs/default-blog/master-how-to-throw-overhead-pass-basketball-expert-guide" target="_blank" rel="noopener">Master How to Throw Overhead Pass Basketball (HoopsKing)</a><span class="tag">Coaching</span><br><span class="supp">Overhead-pass elbow/knee cues; basis for the knee-range correction.</span></li>
+        <li><a href="https://www.thehoopsgeek.com/basketball-outlet-pass/" target="_blank" rel="noopener">The Outlet Pass: A Basketball Coach's Guide (TheHoopsGeek)</a><span class="tag">Coaching</span><br><span class="supp">Leg-power generation for the overhead/outlet pass — no straighter-stance mention.</span></li>
+      </ol>
+    </section>
+  </div>
+</article>
+
+<footer>
+  <div class="wrap"><span class="foot-note">CourtCoach Research · Passing — draft. Metric values current; prose is placeholder.</span></div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>CourtCoach — The AI coach that watches you play</title>
+<style>
+  :root {
+    /* light — "gym daylight" */
+    --bg: #EEEBE4;
+    --surface: #FFFFFF;
+    --surface-2: #F6F3EC;
+    --ink: #171410;
+    --muted: #5B554B;
+    --faint: #8C8676;
+    --line: #DCD6C9;
+    --accent: #E8481A;
+    --accent-deep: #B4340E;
+    --accent-tint: #FADFD1;
+    --court: rgba(23, 20, 16, 0.10);
+    --good: #2C7A54;
+
+    --f-display: "Arial Narrow", "Helvetica Neue", Helvetica, system-ui, sans-serif;
+    --f-body: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --f-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+
+    --maxw: 1140px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #100E0A;
+      --surface: #191510;
+      --surface-2: #211C15;
+      --ink: #F5F1E8;
+      --muted: #ADA595;
+      --faint: #726B5C;
+      --line: #2C261D;
+      --accent: #FF6636;
+      --accent-deep: #FF8659;
+      --accent-tint: #3A1D11;
+      --court: rgba(245, 241, 232, 0.09);
+      --good: #57BE8B;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #100E0A; --surface: #191510; --surface-2: #211C15; --ink: #F5F1E8;
+    --muted: #ADA595; --faint: #726B5C; --line: #2C261D; --accent: #FF6636;
+    --accent-deep: #FF8659; --accent-tint: #3A1D11; --court: rgba(245,241,232,0.09); --good: #57BE8B;
+  }
+  :root[data-theme="light"] {
+    --bg: #EEEBE4; --surface: #FFFFFF; --surface-2: #F6F3EC; --ink: #171410;
+    --muted: #5B554B; --faint: #8C8676; --line: #DCD6C9; --accent: #E8481A;
+    --accent-deep: #B4340E; --accent-tint: #FADFD1; --court: rgba(23,20,16,0.10); --good: #2C7A54;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--f-body);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: inherit; text-decoration: none; }
+
+  .shell { max-width: var(--maxw); margin: 0 auto; padding: 0 1.5rem; }
+
+  .eyebrow {
+    font-family: var(--f-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  /* ---------- Header ---------- */
+  header.nav {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 86%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav-in { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .brand { display: flex; align-items: center; gap: 0.6rem; font-family: var(--f-display); font-weight: 700; }
+  .brand .mark {
+    width: 26px; height: 26px; border-radius: 50%;
+    background: var(--accent);
+    position: relative; flex: none;
+    box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--accent-deep) 60%, transparent);
+  }
+  .brand .mark::before, .brand .mark::after {
+    content: ""; position: absolute; background: var(--accent-deep); opacity: 0.85;
+  }
+  .brand .mark::before { left: 50%; top: 0; width: 1.6px; height: 100%; transform: translateX(-50%); }
+  .brand .mark::after { top: 50%; left: 0; height: 1.6px; width: 100%; transform: translateY(-50%); }
+  .brand .name { font-size: 1.28rem; letter-spacing: 0.01em; text-transform: uppercase; }
+  .brand .name b { color: var(--accent); font-weight: 700; }
+  .nav-links { display: flex; align-items: center; gap: 1.9rem; }
+  .nav-links a {
+    font-size: 0.83rem; font-weight: 600; letter-spacing: 0.03em;
+    color: var(--muted); text-transform: uppercase; font-family: var(--f-mono);
+  }
+  .nav-links a:hover { color: var(--ink); }
+  .nav-pill {
+    font-family: var(--f-mono); font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+    padding: 0.35rem 0.7rem; border-radius: 999px; white-space: nowrap;
+  }
+  @media (max-width: 760px) { .nav-links a:not(.nav-pill) { display: none; } }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; padding: clamp(3rem, 7vw, 6rem) 0 clamp(3rem, 6vw, 5rem); overflow: hidden; }
+  .hero::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      radial-gradient(circle at 82% 30%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 45%);
+  }
+  .court-lines { position: absolute; inset: 0; z-index: 0; pointer-events: none; opacity: 0.9; }
+  .hero-grid {
+    position: relative; z-index: 1;
+    display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(1.5rem, 4vw, 3rem); align-items: center;
+  }
+  @media (max-width: 900px) { .hero-grid { grid-template-columns: 1fr; } }
+
+  h1 {
+    font-family: var(--f-display); font-weight: 700;
+    font-size: clamp(2.9rem, 7.5vw, 5.4rem); line-height: 0.92;
+    letter-spacing: -0.01em; text-transform: uppercase; margin: 0.9rem 0 0;
+    text-wrap: balance;
+  }
+  h1 .hl { color: var(--accent); display: inline-block; }
+  .lede { font-size: clamp(1.05rem, 2vw, 1.28rem); color: var(--muted); max-width: 46ch; margin: 1.4rem 0 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2rem; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    font-family: var(--f-mono); font-size: 0.82rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;
+    padding: 0.85rem 1.35rem; border-radius: 4px; border: 1.5px solid transparent; cursor: pointer;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-deep); }
+  .btn-ghost { border-color: var(--line); color: var(--ink); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .btn .arrow { transition: transform 0.18s ease; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- Pose tracker visual ---------- */
+  .tracker {
+    position: relative; aspect-ratio: 4 / 5; width: 100%;
+    background:
+      linear-gradient(155deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--line); border-radius: 14px; overflow: hidden;
+    box-shadow: 0 30px 60px -35px rgba(0,0,0,0.5);
+  }
+  .tracker .hud {
+    position: absolute; top: 12px; left: 14px; right: 14px; z-index: 3;
+    display: flex; justify-content: space-between; align-items: center;
+    font-family: var(--f-mono); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--faint);
+  }
+  .tracker .rec { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--accent); }
+  .tracker .rec .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: blink 1.4s steps(2,end) infinite; }
+  @keyframes blink { 50% { opacity: 0.25; } }
+  .tracker svg { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; }
+  .scan { animation: sweep 3.6s ease-in-out infinite; }
+  @keyframes sweep { 0%,100% { transform: translateY(-46%); } 50% { transform: translateY(46%); } }
+  .joint { animation: pulse 2.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .joint:nth-child(2n) { animation-delay: 0.4s; }
+  .joint:nth-child(3n) { animation-delay: 0.8s; }
+  @keyframes pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
+  .callout .box { fill: var(--surface); stroke: var(--accent); }
+  .callout text { font-family: var(--f-mono); fill: var(--ink); }
+  .callout .k { fill: var(--faint); }
+  @media (prefers-reduced-motion: reduce) { .scan, .joint, .rec .dot { animation: none; } }
+
+  /* ---------- Section frame ---------- */
+  section { position: relative; }
+  .band { padding: clamp(3.5rem, 7vw, 5.5rem) 0; }
+  .band.alt { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .sec-head { max-width: 60ch; margin-bottom: 2.6rem; }
+  h2 {
+    font-family: var(--f-display); font-weight: 700; text-transform: uppercase;
+    font-size: clamp(1.9rem, 4.2vw, 3rem); line-height: 1.0; letter-spacing: -0.005em;
+    margin: 0.7rem 0 0; text-wrap: balance;
+  }
+  .sec-head p { color: var(--muted); font-size: 1.06rem; margin: 0.9rem 0 0; }
+
+  /* ---------- Positioning strip ---------- */
+  .pitch { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  @media (max-width: 720px) { .pitch { grid-template-columns: 1fr; } }
+  .pitch > div { padding: 1.8rem; }
+  .pitch .them { background: var(--surface-2); }
+  .pitch .us { background: color-mix(in srgb, var(--accent) 9%, var(--surface)); border-left: 3px solid var(--accent); }
+  .pitch h3 { font-family: var(--f-mono); font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 0.7rem; color: var(--faint); }
+  .pitch .us h3 { color: var(--accent); }
+  .pitch p { margin: 0; font-size: 1.12rem; }
+  .pitch strong { font-weight: 700; }
+
+  /* ---------- How it works ---------- */
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.1rem; counter-reset: step; }
+  @media (max-width: 860px) { .steps { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .steps { grid-template-columns: 1fr; } }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 1.5rem 1.3rem; position: relative; }
+  .band.alt .step { background: var(--surface-2); }
+  .step .num {
+    counter-increment: step; font-family: var(--f-display); font-weight: 700; font-size: 2.6rem; line-height: 1;
+    color: var(--accent); display: block;
+  }
+  .step .num::before { content: counter(step, decimal-leading-zero); }
+  .step h3 { font-size: 1.12rem; margin: 0.7rem 0 0.4rem; letter-spacing: -0.01em; }
+  .step p { margin: 0; color: var(--muted); font-size: 0.94rem; }
+
+  /* ---------- Drills ---------- */
+  .drills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.1rem; }
+  @media (max-width: 820px) { .drills { grid-template-columns: 1fr; } }
+  .cat { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .cat-top { padding: 1.3rem 1.4rem 1rem; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; justify-content: space-between; }
+  .cat-top h3 { font-family: var(--f-display); text-transform: uppercase; font-size: 1.5rem; font-weight: 700; margin: 0; letter-spacing: 0.01em; }
+  .cat-top span { font-family: var(--f-mono); font-size: 0.68rem; color: var(--faint); letter-spacing: 0.08em; }
+  .cat ul { list-style: none; margin: 0; padding: 0.6rem 0.6rem 1rem; }
+  .cat li { display: flex; align-items: center; gap: 0.7rem; padding: 0.55rem 0.8rem; font-weight: 500; }
+  .cat li::before { content: ""; width: 6px; height: 6px; background: var(--accent); border-radius: 50%; flex: none; }
+
+  /* ---------- Metrics chips ---------- */
+  .chips { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+  .chip {
+    font-family: var(--f-mono); font-size: 0.8rem; letter-spacing: 0.02em;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 0.55rem 0.85rem; display: inline-flex; gap: 0.5rem; align-items: baseline;
+  }
+  .band.alt .chip { background: var(--surface-2); }
+  .chip .lbl { color: var(--muted); text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.06em; }
+  .chip .val { color: var(--accent); font-weight: 600; }
+
+  /* ---------- Science ---------- */
+  .science-wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: clamp(1.5rem,4vw,3rem); align-items: center; }
+  @media (max-width: 820px) { .science-wrap { grid-template-columns: 1fr; } }
+  .science-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .science-stats .s { background: var(--surface); padding: 1.4rem 1rem; }
+  .band.alt .science-stats .s { background: var(--surface-2); }
+  .science-stats .n { font-family: var(--f-display); font-weight: 700; font-size: 2.6rem; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .science-stats .l { font-family: var(--f-mono); font-size: 0.64rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-top: 0.35rem; display: block; }
+
+  /* ---------- Footer ---------- */
+  footer { background: var(--surface); border-top: 1px solid var(--line); padding: 3rem 0 2.4rem; }
+  .foot-in { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1.5rem; align-items: center; }
+  .foot-note { font-family: var(--f-mono); font-size: 0.74rem; color: var(--faint); letter-spacing: 0.04em; }
+  .foot-links { display: flex; gap: 1.4rem; }
+  .foot-links a { font-family: var(--f-mono); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+  .foot-links a:hover { color: var(--accent); }
+
+  .placeholder-flag {
+    display: inline-block; font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--faint); border: 1px dashed var(--line); padding: 0.2rem 0.5rem; border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HEADER ================= -->
+<header class="nav">
+  <div class="shell nav-in">
+    <a class="brand" href="#top" aria-label="CourtCoach home">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="name">Court<b>Coach</b></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#how">How it works</a>
+      <a href="#drills">Drills</a>
+      <a href="#science">Research</a>
+      <a class="nav-pill" href="#top">Coming to iOS &amp; Android</a>
+    </nav>
+  </div>
+</header>
+
+<span id="top"></span>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <svg class="court-lines" viewBox="0 0 1440 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+    <g fill="none" stroke="var(--court)" stroke-width="2">
+      <circle cx="1240" cy="120" r="150"/>
+      <circle cx="1240" cy="120" r="60"/>
+      <path d="M1090 -40 v320 M1390 -40 v320"/>
+      <path d="M-40 560 h1520"/>
+    </g>
+  </svg>
+  <div class="shell hero-grid">
+    <div class="hero-copy">
+      <span class="eyebrow">AI form coaching &middot; powered by live pose tracking</span>
+      <h1>Your camera is<br>now a <span class="hl">basketball<br>coach.</span></h1>
+      <p class="lede">CourtCoach watches you practice through your phone camera, reads your shooting form in real time, and coaches you like a real trainer &mdash; the <em>why</em> and the fix, not just the stats.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="#how">See how it works <span class="arrow">&rarr;</span></a>
+        <a class="btn btn-ghost" href="#science">Read the research</a>
+      </div>
+    </div>
+
+    <!-- Pose tracker signature visual -->
+    <div class="tracker" role="img" aria-label="Illustration of AI pose tracking a player's shooting form, with live joint-angle readouts">
+      <div class="hud">
+        <span class="rec"><span class="dot"></span> Tracking</span>
+        <span>Jump Shot &middot; 30&nbsp;fps</span>
+      </div>
+      <svg viewBox="0 0 400 480" preserveAspectRatio="xMidYMid meet">
+        <!-- scan line -->
+        <line class="scan" x1="30" y1="240" x2="370" y2="240" stroke="var(--accent)" stroke-width="1.2" opacity="0.35"/>
+        <!-- bones -->
+        <g stroke="var(--accent)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity="0.9">
+          <path d="M210 78 L207 118"/>            <!-- neck -->
+          <path d="M180 122 L235 116"/>           <!-- shoulders -->
+          <path d="M207 118 L205 240"/>           <!-- spine -->
+          <path d="M235 116 L256 90 L250 54"/>    <!-- right arm up (shooting) -->
+          <path d="M180 122 L158 152 L186 138"/>  <!-- left arm (guide) -->
+          <path d="M188 240 L222 240"/>           <!-- hips -->
+          <path d="M222 240 L236 322 L221 406"/>  <!-- right leg -->
+          <path d="M188 240 L174 324 L191 408"/>  <!-- left leg -->
+        </g>
+        <!-- angle arcs -->
+        <g fill="none" stroke="var(--accent)" stroke-width="1.6" opacity="0.7">
+          <path d="M244 84 A 22 22 0 0 1 266 98"/>
+          <path d="M224 300 A 22 22 0 0 0 248 314"/>
+        </g>
+        <!-- ball -->
+        <circle cx="248" cy="34" r="20" fill="none" stroke="var(--accent)" stroke-width="3"/>
+        <path d="M228 34 h40 M248 14 v40 M234 20 q14 14 28 0 M234 48 q14 -14 28 0" stroke="var(--accent)" stroke-width="1.4" fill="none" opacity="0.7"/>
+        <!-- joints -->
+        <g fill="var(--accent)">
+          <circle class="joint" cx="210" cy="72" r="7"/>
+          <circle class="joint" cx="180" cy="122" r="5.5"/>
+          <circle class="joint" cx="235" cy="116" r="5.5"/>
+          <circle class="joint" cx="256" cy="90" r="5.5"/>
+          <circle class="joint" cx="250" cy="54" r="5.5"/>
+          <circle class="joint" cx="158" cy="152" r="5.5"/>
+          <circle class="joint" cx="205" cy="240" r="5.5"/>
+          <circle class="joint" cx="236" cy="322" r="5.5"/>
+          <circle class="joint" cx="221" cy="406" r="5.5"/>
+          <circle class="joint" cx="174" cy="324" r="5.5"/>
+          <circle class="joint" cx="191" cy="408" r="5.5"/>
+        </g>
+        <!-- callouts -->
+        <g class="callout">
+          <g transform="translate(280 78)">
+            <rect class="box" x="0" y="0" width="104" height="34" rx="4" stroke-width="1.3"/>
+            <text class="k" x="10" y="15" font-size="9" letter-spacing="1">ELBOW</text>
+            <text x="10" y="28" font-size="14" font-weight="700"><tspan id="a-elbow">63</tspan>&#176;</text>
+            <text x="66" y="28" font-size="9" fill="var(--good)">OK</text>
+          </g>
+          <g transform="translate(268 300)">
+            <rect class="box" x="0" y="0" width="110" height="34" rx="4" stroke-width="1.3"/>
+            <text class="k" x="10" y="15" font-size="9" letter-spacing="1">KNEE</text>
+            <text x="10" y="28" font-size="14" font-weight="700"><tspan id="a-knee">112</tspan>&#176;</text>
+            <text x="70" y="28" font-size="9" fill="var(--good)">OK</text>
+          </g>
+          <g transform="translate(20 40)">
+            <rect class="box" x="0" y="0" width="118" height="34" rx="4" stroke-width="1.3"/>
+            <text class="k" x="10" y="15" font-size="9" letter-spacing="1">RELEASE HT</text>
+            <text x="10" y="28" font-size="14" font-weight="700"><tspan id="a-rel">116</tspan></text>
+          </g>
+          <g transform="translate(18 404)">
+            <rect class="box" x="0" y="0" width="118" height="34" rx="4" stroke-width="1.3"/>
+            <text class="k" x="10" y="15" font-size="9" letter-spacing="1">BALANCE</text>
+            <text x="10" y="28" font-size="14" font-weight="700"><tspan id="a-bal">88</tspan></text>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ================= POSITIONING ================= -->
+<section class="band alt">
+  <div class="shell">
+    <div class="sec-head">
+      <span class="eyebrow">The difference</span>
+      <h2>Stat trackers count. CourtCoach coaches.</h2>
+    </div>
+    <div class="pitch">
+      <div class="them">
+        <h3>Everyone else</h3>
+        <p>Apps track <strong>how many</strong> shots you made and missed &mdash; then leave you to figure out why on your own.</p>
+      </div>
+      <div class="us">
+        <h3>CourtCoach</h3>
+        <p>Reads <strong>how</strong> you shoot &mdash; elbow, knee, balance, follow-through &mdash; and tells you exactly what to fix, mid-drill, out loud.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="band" id="how">
+  <div class="shell">
+    <div class="sec-head">
+      <span class="eyebrow">How it works</span>
+      <h2>Four steps, one drill at a time.</h2>
+      <p>No wearables, no setup, no coach required. Prop up your phone and start shooting.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="num"></span>
+        <h3>Point the camera</h3>
+        <p>Set your phone down where it can see you, pick a drill, and go. That's the whole setup.</p>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <h3>AI reads your body</h3>
+        <p>Live pose tracking maps your joints and measures the angles that make or break your form.</p>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <h3>Coaching, out loud</h3>
+        <p>Every few seconds you get one spoken tip &mdash; specific, plain-language, and tied to what your body just did.</p>
+      </div>
+      <div class="step">
+        <span class="num"></span>
+        <h3>Full breakdown</h3>
+        <p>When you finish, get a summary of your strengths, your #1 fix, and your session saved to track progress.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DRILLS ================= -->
+<section class="band alt" id="drills">
+  <div class="shell">
+    <div class="sec-head">
+      <span class="eyebrow">Ten drills, three skills</span>
+      <h2>Train the fundamentals that actually move the needle.</h2>
+    </div>
+    <div class="drills">
+      <div class="cat">
+        <div class="cat-top"><h3>Shooting</h3><span>4 drills</span></div>
+        <ul>
+          <li>Free Throw</li>
+          <li>Jump Shot</li>
+          <li>3-Point Shot</li>
+          <li>Layup</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <div class="cat-top"><h3>Passing</h3><span>3 drills</span></div>
+        <ul>
+          <li>Chest Pass</li>
+          <li>Bounce Pass</li>
+          <li>Overhead Pass</li>
+        </ul>
+      </div>
+      <div class="cat">
+        <div class="cat-top"><h3>Dribbling</h3><span>3 drills</span></div>
+        <ul>
+          <li>Crossover</li>
+          <li>Between the Legs</li>
+          <li>Ball Handling</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="sec-head" style="margin: 2.8rem 0 1.2rem; max-width:none;">
+      <span class="eyebrow">What it measures</span>
+    </div>
+    <div class="chips">
+      <span class="chip"><span class="lbl">Elbow</span><span class="val">45&ndash;80&#176;</span></span>
+      <span class="chip"><span class="lbl">Knee bend</span><span class="val">100&ndash;125&#176;</span></span>
+      <span class="chip"><span class="lbl">Release ht</span><span class="val">110+</span></span>
+      <span class="chip"><span class="lbl">Balance</span><span class="val">70+</span></span>
+      <span class="chip"><span class="lbl">Follow-through</span><span class="val">/100</span></span>
+      <span class="chip"><span class="lbl">Body control</span><span class="val">65+</span></span>
+      <span class="chip"><span class="lbl">Hand position</span><span class="val">70+</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SCIENCE ================= -->
+<section class="band" id="science">
+  <div class="shell science-wrap">
+    <div>
+      <span class="eyebrow">Grounded in the research</span>
+      <h2>Every target range is checked against biomechanics.</h2>
+      <p style="color:var(--muted); font-size:1.06rem; margin-top:1rem;">CourtCoach's ideal form ranges aren't guesses. Each one is fact-checked against peer-reviewed shooting and movement studies &mdash; and where the science is thin, we say so plainly. We publish the whole methodology so you can see exactly how the AI decides what "good form" means.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="research/index.html">Explore the research <span class="arrow">&rarr;</span></a>
+      </div>
+    </div>
+    <div class="science-stats">
+      <div class="s"><div class="n">24</div><span class="l">Sources cited</span></div>
+      <div class="s"><div class="n">8</div><span class="l">Peer-reviewed studies</span></div>
+      <div class="s"><div class="n">44</div><span class="l">Metrics reviewed</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer>
+  <div class="shell">
+    <div class="foot-in">
+      <a class="brand" href="#top">
+        <span class="mark" aria-hidden="true"></span>
+        <span class="name">Court<b>Coach</b></span>
+      </a>
+      <div class="foot-links">
+        <a href="#how">How it works</a>
+        <a href="#drills">Drills</a>
+        <a href="#science">Research</a>
+      </div>
+    </div>
+    <div style="margin-top:1.6rem; display:flex; flex-wrap:wrap; gap:0.8rem; align-items:center; justify-content:space-between;">
+      <span class="foot-note">Built for beginner &amp; intermediate players, ages 12+. No coach required.</span>
+      <span class="placeholder-flag">Mobile app in development &middot; web preview live</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Make the hero readouts feel "live" — small drift within realistic ranges.
+  (function () {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var fields = [
+      { id: 'a-elbow', base: 63, spread: 6 },
+      { id: 'a-knee', base: 112, spread: 5 },
+      { id: 'a-rel', base: 116, spread: 4 },
+      { id: 'a-bal', base: 88, spread: 5 }
+    ];
+    setInterval(function () {
+      fields.forEach(function (f) {
+        var el = document.getElementById(f.id);
+        if (!el) return;
+        var v = f.base + Math.round((Math.random() - 0.5) * 2 * f.spread);
+        el.textContent = v;
+      });
+    }, 900);
+  })();
+</script>
+
+</body>
+</html>

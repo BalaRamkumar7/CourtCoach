@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>Staying Low, Staying in Control — CourtCoach Research</title>
+<style>
+  :root{
+    --bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;
+    --muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;
+    --accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;
+    --f-display:"Arial Narrow","Helvetica Neue",Helvetica,system-ui,sans-serif;
+    --f-body:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;
+    --muted:#ADA595;--faint:#726B5C;--line:#2C261D;
+    --accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;
+  }}
+  :root[data-theme="dark"]{--bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;--muted:#ADA595;--faint:#726B5C;--line:#2C261D;--accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;}
+  :root[data-theme="light"]{--bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;--muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;--accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.68;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent-deep);}
+  .eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .nav-in{max-width:1080px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;}
+  .brand{display:flex;align-items:center;gap:.55rem;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:1.15rem;text-decoration:none;color:var(--ink);}
+  .brand .mark{width:20px;height:20px;border-radius:50%;background:var(--accent);position:relative;flex:none;}
+  .brand .mark::before,.brand .mark::after{content:"";position:absolute;background:var(--bg);opacity:.9;}
+  .brand .mark::before{left:50%;top:0;width:1.3px;height:100%;transform:translateX(-50%);}
+  .brand .mark::after{top:50%;left:0;height:1.3px;width:100%;transform:translateY(-50%);}
+  .brand b{color:var(--accent);}
+  .nav-back{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+  .nav-back:hover{color:var(--accent);}
+  .wrap{max-width:46rem;margin:0 auto;padding:0 1.5rem;}
+  article{padding:clamp(2.5rem,6vw,4.5rem) 0 4rem;}
+  .crumb{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:1.4rem;}
+  .crumb a{color:var(--accent);text-decoration:none;}
+  h1{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:clamp(2.6rem,6vw,4.2rem);line-height:.94;letter-spacing:.005em;margin:.6rem 0 0;}
+  .dek{font-size:1.25rem;color:var(--muted);margin:1.3rem 0 0;line-height:1.5;}
+  .byline{display:flex;flex-wrap:wrap;gap:1.2rem;margin:1.8rem 0 0;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);}
+  .byline .status{display:inline-flex;align-items:center;gap:.4rem;color:var(--accent);}
+  .byline .status .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+  .abstract{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:1.4rem 1.5rem;margin:2.2rem 0;}
+  .abstract .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.5rem;}
+  .toc{margin:2.2rem 0;padding:1.2rem 1.4rem;border:1px dashed var(--line);border-radius:10px;}
+  .toc .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);}
+  .toc ol{margin:.6rem 0 0;padding-left:1.2rem;font-family:var(--f-mono);font-size:.85rem;line-height:1.9;}
+  .toc a{color:var(--ink);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+  h2{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:1.9rem;line-height:1.05;letter-spacing:.01em;margin:3rem 0 .3rem;scroll-margin-top:5rem;}
+  .h2num{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);letter-spacing:.1em;}
+  p{font-size:1.13rem;margin:1rem 0;}
+  .ph{border-left:2px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent);padding:.7rem 1rem;margin:1rem 0;border-radius:0 6px 6px 0;}
+  .ph .tag{font-family:var(--f-mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.35rem;}
+  .ph p{font-style:italic;color:var(--muted);font-size:1rem;margin:.3rem 0;}
+  .greek{color:var(--faint);}
+  table.metrics{width:100%;border-collapse:collapse;margin:1.3rem 0;font-family:var(--f-mono);font-size:.86rem;}
+  table.metrics caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:.6rem;}
+  table.metrics th,table.metrics td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);}
+  table.metrics thead th{color:var(--faint);font-weight:700;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;border-bottom:1.5px solid var(--line);}
+  table.metrics td.val{color:var(--accent-deep);font-weight:600;}
+  .tbl-wrap{overflow-x:auto;}
+  figure.fig{margin:1.6rem 0;}
+  .fig-ph{border:1px dashed var(--line);border-radius:10px;background:var(--surface-2);min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:1.5rem;}
+  figcaption{font-family:var(--f-mono);font-size:.74rem;color:var(--faint);margin-top:.6rem;}
+  figcaption b{color:var(--accent);}
+  .note{border:1px solid var(--line);border-radius:10px;padding:1rem 1.2rem;margin:1.6rem 0;background:var(--surface);}
+  .note .lbl{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .note p{font-size:1rem;margin:.4rem 0 0;color:var(--muted);}
+  .refs{margin-top:3.5rem;padding-top:1.6rem;border-top:2px solid var(--ink);}
+  .refs h2{margin-top:0;}
+  ol.reflist{list-style:none;counter-reset:r;margin:1.2rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem;}
+  ol.reflist li{counter-increment:r;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;font-size:.94rem;line-height:1.45;}
+  ol.reflist li::before{content:"D" counter(r);font-family:var(--f-mono);font-size:.76rem;color:var(--accent);font-weight:700;padding-top:.15rem;}
+  ol.reflist a{color:var(--accent-deep);text-decoration:none;}
+  ol.reflist a:hover{text-decoration:underline;}
+  ol.reflist .tag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:3px;padding:.05rem .35rem;margin-left:.35rem;white-space:nowrap;}
+  ol.reflist .supp{color:var(--muted);font-style:italic;}
+  footer{border-top:1px solid var(--line);padding:2rem 0 3rem;}
+  .foot-note{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span> Court<b>Coach</b></a>
+    <a class="nav-back" href="index.html">← All research</a>
+  </div>
+</header>
+
+<article>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Research</a> / Dribbling</div>
+    <span class="eyebrow">Dribbling · Research</span>
+    <h1>Staying Low, Staying in Control</h1>
+    <p class="dek">Crossover, between-the-legs, and ball handling — how knee bend, hand position, and body control turn great-handler fundamentals into measurable coaching targets.</p>
+    <div class="byline">
+      <span class="status"><span class="dot"></span> Draft</span>
+      <span>July 2026</span>
+      <span>7 sources</span>
+    </div>
+
+    <div class="abstract">
+      <span class="lbl">Abstract</span>
+      <p style="margin:0;">Dribbling is the least-studied skill in this series, and CourtCoach's dribbling model reflects that. A single low-rigor study gives the only measured dribble knee angle we could find; every other target rests on coaching cues rather than data [D7]. This paper covers the crossover, between-the-legs, and stationary ball handling, and is upfront that Balance, Hand Position and Body Lean are unit-less scores with no literature behind them at all. It also documents the one clear correction the audit produced: fixing a between-the-legs knee range that demanded a deeper bend than the evidence supports.</p>
+    </div>
+
+    <div class="toc">
+      <span class="lbl">Contents</span>
+      <ol>
+        <li><a href="#intro">How little we actually know</a></li>
+        <li><a href="#crossover">Crossover</a></li>
+        <li><a href="#btl">Between the Legs</a></li>
+        <li><a href="#handling">Ball Handling</a></li>
+        <li><a href="#limits">Limitations &amp; open questions</a></li>
+      </ol>
+    </div>
+
+    <h2 id="intro"><span class="h2num">01 /</span> How little we actually know</h2>
+    <div class="note">
+      <span class="lbl">Honest framing</span>
+      <p>No source, academic or coaching, publishes an ideal knee-flexion range for these moves. One low-rigor study (D7) is the only source with a measured dribble knee angle — 103.85° ± 18.95° at execution — from a single sagittal-plane frame in a non-indexed journal. Hand Position and Body Lean have no numeric literature at all.</p>
+    </div>
+    <p>Dribbling research barely exists in the form CourtCoach needs. The one academic study that touches a crossover-type move measures the center of gravity's velocity, not joint angles [D6], and the only source with an actual knee number is a single-frame analysis from a non-indexed journal that should be treated as weak support, never a keystone [D7]. So what does the app measure? Knee bend, plus three 0&ndash;100 scores &mdash; Balance, Hand Position and Body Lean. Where research is silent, well-established coaching cues do the work: stay low, keep the ball below the knees, stay balanced over the ball. Those cues are consistent enough across sources to build defaults from &mdash; as long as no one mistakes a default for a measurement.</p>
+
+    <h2 id="crossover"><span class="h2num">02 /</span> Crossover</h2>
+    <p>The crossover is the most-coached of the three moves, and the cues line up cleanly. Every source describes a low, &ldquo;sit-down&rdquo; athletic stance with the ball kept low &mdash; below the knees &mdash; and tight to the body [D2, D3]. That supports our knee-bend target of 100&ndash;133&deg;, and the one measured datapoint we have, a low-dribble knee angle of about 104&deg;, sits right at the low edge of that range: weak empirical backing, but backing all the same [D7]. The crossover is also the only move with a real claim on Body Lean &mdash; dropping a shoulder and leaning to sell the fake is a named, deliberate part of the technique [D3], which is why the metric earns its place here more than elsewhere.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Crossover</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Knee Bend</td><td class="val">100–133°</td><td>90–143°</td><td>Cue + D7</td></tr>
+          <tr><td>Balance</td><td class="val">80+</td><td>65+</td><td>App score</td></tr>
+          <tr><td>Hand Position</td><td class="val">70+</td><td>55+</td><td>App score, D2 D3</td></tr>
+          <tr><td>Body Lean</td><td class="val">70+</td><td>55+</td><td>App score, D3</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="fig">
+      <div class="fig-ph">[ Figure placeholder — e.g. crossover stance with knee angle &amp; ball height ]</div>
+      <figcaption><b>Figure 1.</b> A crossover at its lowest point: knees bent into an athletic stance, the ball crossing below knee height, weight loaded to change direction. [Replace with a real annotated frame.]</figcaption>
+    </figure>
+
+    <h2 id="btl"><span class="h2num">03 /</span> Between the Legs</h2>
+    <p>Between-the-legs is where the audit found its dribbling correction. CourtCoach used to demand a tighter, deeper knee bend for this move &mdash; a range of 90&ndash;110&deg; &mdash; than for the crossover, implying it is taken from a lower crouch. The coaching literature doesn't support that. What the move actually calls for is a <em>wide</em> base to give the ball room to pass through, and stance width and knee depth are different variables &mdash; a wider stance is stable at a shallower squat, if anything [D5]. The deeper-bend assumption looked like an unfounded guess, so we unified the range with the crossover at 100&ndash;133&deg;. Like every dribbling angle it remains an estimate &mdash; but no longer a self-contradictory one.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Between the Legs</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Knee Bend</td><td class="val">100–133°</td><td>90–143°</td><td>Corrected, D5</td></tr>
+          <tr><td>Balance</td><td class="val">80+</td><td>65+</td><td>App score</td></tr>
+          <tr><td>Hand Position</td><td class="val">65+</td><td>50+</td><td>App score</td></tr>
+          <tr><td>Body Lean</td><td class="val">65+</td><td>50+</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="handling"><span class="h2num">04 /</span> Ball Handling</h2>
+    <p>Stationary ball handling is drilled precisely to build the habits the other moves rely on, and its cues are the strictest. Coaches actively correct players who rise up during handling work &mdash; &ldquo;bend the knees deeper, freeze the head height so only the hands and the ball move&rdquo; &mdash; which supports keeping the same low knee range here [D4]. Its hand-position threshold is the tightest of the three moves for the same reason: USA Basketball's development curriculum treats a &ldquo;waist-high or lower&rdquo; dribble as a non-negotiable, and a stationary drill is exactly where that gets enforced [D4]. The low-dribble study's measured knee angle is the closest empirical analogue we have for any of this [D7], though it is a single frame and shouldn't be leaned on.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Ball Handling</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Knee Bend</td><td class="val">100–133°</td><td>90–143°</td><td>Cue + D4 D7</td></tr>
+          <tr><td>Balance</td><td class="val">80+</td><td>65+</td><td>App score</td></tr>
+          <tr><td>Hand Position</td><td class="val">75+</td><td>60+</td><td>App score, D4</td></tr>
+          <tr><td>Body Lean</td><td class="val">70+</td><td>55+</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2 id="limits"><span class="h2num">05 /</span> Limitations &amp; open questions</h2>
+    <p>There is no way around it: dribbling thresholds are almost entirely engineering estimates backed by coaching cues, and the one number with any measurement behind it comes from a non-indexed journal that should never be a keystone [D7]. Moving this model onto firmer ground would take a proper dribble-kinematics dataset &mdash; measured knee, stance-width and hand-height data across skilled and unskilled handlers &mdash; which, as far as we can tell, doesn't yet exist. Until it does, the honest description of CourtCoach's dribbling metrics is that they encode good coaching, consistently applied, rather than findings. That is a reasonable place to start; it just shouldn't be mistaken for the finish.</p>
+    <div class="note">
+      <span class="lbl">Methods note</span>
+      <p>Every target range on this page is the live value from CourtCoach's current build, and each verdict traces to the sources listed below. For the full method and the verdict on all 44 metrics across every skill, see the <a href="methodology.html">methodology paper</a>.</p>
+    </div>
+
+    <section class="refs">
+      <h2>References</h2>
+      <ol class="reflist">
+        <li><a href="https://www.breakthroughbasketball.com/defense/stance" target="_blank" rel="noopener">Basketball Defense: 10 Keys to a Great Defensive Stance (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Generic athletic/defensive stance cues, no degree figures.</span></li>
+        <li><a href="https://www.breakthroughbasketball.com/training/beginner-crossover.html" target="_blank" rel="noopener">Beginner Drills To Develop An Effective Crossover Move (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Crossover stance depth, ball-below-knees cue.</span></li>
+        <li><a href="https://xbotgo.com/blogs/knowledge/crossover-dribble" target="_blank" rel="noopener">How to Do a Crossover Dribble (XbotGo)</a><span class="tag">Coaching</span><br><span class="supp">Crossover stance, ball height, lean/shoulder-drop misdirection cue.</span></li>
+        <li><a href="https://joinstriveon.com/blog/basketball-dribbling-drills" target="_blank" rel="noopener">Basketball Dribbling Drills: 15 Drills for Every Level (joinstriveon.com)</a><span class="tag">Coaching</span><br><span class="supp">USA Basketball "waist-high or lower" cue; stationary-drill knee-depth correction.</span></li>
+        <li><a href="https://www.sporator.com/basketball-defensive-stance/" target="_blank" rel="noopener">Fundamentals of Good Basketball Defensive Stance and Footwork (Sporator)</a><span class="tag">Coaching</span><br><span class="supp">The one explicit generic stance figure (~45° knee bend), used as a reference point.</span></li>
+        <li><a href="https://ojs.ub.uni-konstanz.de/cpa/article/view/6030" target="_blank" rel="noopener">Biomechanical Study on a Basketball Dribble with a Cutting Motion (ISBS / Uni Konstanz)</a><span class="tag">Paper</span><br><span class="supp">Peer-reviewed crossover-type study; measures center-of-gravity velocity, not joint angles.</span></li>
+        <li><a href="https://www.academia.edu/1264533" target="_blank" rel="noopener">Kinematic Analysis of Low Dribble at Execution Phase (Pandey &amp; Patel, Golden Research Thoughts, 2012)</a><span class="tag">Paper · low-rigor</span><br><span class="supp">Only source with a measured dribble knee angle (103.85° ± 18.95°, n=20). Non-indexed journal — weak support only.</span></li>
+      </ol>
+    </section>
+  </div>
+</article>
+
+<footer>
+  <div class="wrap"><span class="foot-note">CourtCoach Research · Dribbling — draft. Metric values current; prose is placeholder.</span></div>
+</footer>
+
+</body>
+</html>

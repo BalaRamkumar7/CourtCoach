@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>The Biomechanics of the Shot — CourtCoach Research</title>
+<style>
+  :root{
+    --bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;
+    --muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;
+    --accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;
+    --f-display:"Arial Narrow","Helvetica Neue",Helvetica,system-ui,sans-serif;
+    --f-body:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;
+    --muted:#ADA595;--faint:#726B5C;--line:#2C261D;
+    --accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;
+  }}
+  :root[data-theme="dark"]{--bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;--muted:#ADA595;--faint:#726B5C;--line:#2C261D;--accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;}
+  :root[data-theme="light"]{--bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;--muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;--accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.68;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent-deep);}
+  .eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+
+  header.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .nav-in{max-width:1080px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;height:58px;}
+  .brand{display:flex;align-items:center;gap:.55rem;font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:1.15rem;text-decoration:none;color:var(--ink);}
+  .brand .mark{width:20px;height:20px;border-radius:50%;background:var(--accent);position:relative;flex:none;}
+  .brand .mark::before,.brand .mark::after{content:"";position:absolute;background:var(--bg);opacity:.9;}
+  .brand .mark::before{left:50%;top:0;width:1.3px;height:100%;transform:translateX(-50%);}
+  .brand .mark::after{top:50%;left:0;height:1.3px;width:100%;transform:translateY(-50%);}
+  .brand b{color:var(--accent);}
+  .nav-back{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+  .nav-back:hover{color:var(--accent);}
+
+  .wrap{max-width:46rem;margin:0 auto;padding:0 1.5rem;}
+  article{padding:clamp(2.5rem,6vw,4.5rem) 0 4rem;}
+
+  .crumb{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:1.4rem;}
+  .crumb a{color:var(--accent);text-decoration:none;}
+  h1{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:clamp(2.6rem,6vw,4.2rem);line-height:.94;letter-spacing:.005em;margin:.6rem 0 0;}
+  .dek{font-size:1.25rem;color:var(--muted);margin:1.3rem 0 0;line-height:1.5;}
+  .byline{display:flex;flex-wrap:wrap;gap:1.2rem;margin:1.8rem 0 0;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);}
+  .byline .status{display:inline-flex;align-items:center;gap:.4rem;color:var(--accent);}
+  .byline .status .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+
+  .abstract{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:1.4rem 1.5rem;margin:2.2rem 0;}
+  .abstract .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.5rem;}
+
+  .toc{margin:2.2rem 0;padding:1.2rem 1.4rem;border:1px dashed var(--line);border-radius:10px;}
+  .toc .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);}
+  .toc ol{margin:.6rem 0 0;padding-left:1.2rem;font-family:var(--f-mono);font-size:.85rem;line-height:1.9;}
+  .toc a{color:var(--ink);text-decoration:none;}
+  .toc a:hover{color:var(--accent);}
+
+  h2{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:1.9rem;line-height:1.05;letter-spacing:.01em;margin:3rem 0 .3rem;scroll-margin-top:5rem;}
+  .h2num{font-family:var(--f-mono);font-size:.8rem;color:var(--accent);letter-spacing:.1em;}
+  h3{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:1.25rem;letter-spacing:.02em;margin:2rem 0 .2rem;}
+  p{font-size:1.13rem;margin:1rem 0;}
+
+  /* editable placeholder */
+  .ph{border-left:2px dashed var(--accent);background:color-mix(in srgb,var(--accent) 5%,transparent);padding:.7rem 1rem;margin:1rem 0;border-radius:0 6px 6px 0;}
+  .ph .tag{font-family:var(--f-mono);font-size:.64rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.35rem;}
+  .ph p{font-style:italic;color:var(--muted);font-size:1rem;margin:.3rem 0;}
+  .greek{color:var(--faint);}
+
+  table.metrics{width:100%;border-collapse:collapse;margin:1.3rem 0;font-family:var(--f-mono);font-size:.86rem;}
+  table.metrics caption{caption-side:top;text-align:left;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-bottom:.6rem;}
+  table.metrics th,table.metrics td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);}
+  table.metrics thead th{color:var(--faint);font-weight:700;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;border-bottom:1.5px solid var(--line);}
+  table.metrics td.val{color:var(--accent-deep);font-weight:600;}
+  .tbl-wrap{overflow-x:auto;}
+
+  figure.fig{margin:1.6rem 0;}
+  .fig-ph{border:1px dashed var(--line);border-radius:10px;background:var(--surface-2);min-height:200px;display:flex;align-items:center;justify-content:center;color:var(--faint);font-family:var(--f-mono);font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;text-align:center;padding:1.5rem;}
+  figcaption{font-family:var(--f-mono);font-size:.74rem;color:var(--faint);margin-top:.6rem;}
+  figcaption b{color:var(--accent);}
+
+  .note{border:1px solid var(--line);border-radius:10px;padding:1rem 1.2rem;margin:1.6rem 0;background:var(--surface);}
+  .note .lbl{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+  .note p{font-size:1rem;margin:.4rem 0 0;color:var(--muted);}
+
+  .refs{margin-top:3.5rem;padding-top:1.6rem;border-top:2px solid var(--ink);}
+  .refs h2{margin-top:0;}
+  ol.reflist{list-style:none;counter-reset:r;margin:1.2rem 0 0;padding:0;display:flex;flex-direction:column;gap:.7rem;}
+  ol.reflist li{counter-increment:r;display:grid;grid-template-columns:2.4rem 1fr;gap:.6rem;font-size:.94rem;line-height:1.45;}
+  ol.reflist li::before{content:"S" counter(r);font-family:var(--f-mono);font-size:.76rem;color:var(--accent);font-weight:700;padding-top:.15rem;}
+  ol.reflist a{color:var(--accent-deep);text-decoration:none;}
+  ol.reflist a:hover{text-decoration:underline;}
+  ol.reflist .tag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:3px;padding:.05rem .35rem;margin-left:.35rem;white-space:nowrap;}
+  ol.reflist .supp{color:var(--muted);font-style:italic;}
+
+  footer{border-top:1px solid var(--line);padding:2rem 0 3rem;}
+  .foot-note{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span> Court<b>Coach</b></a>
+    <a class="nav-back" href="index.html">← All research</a>
+  </div>
+</header>
+
+<article>
+  <div class="wrap">
+    <div class="crumb"><a href="index.html">Research</a> / Shooting</div>
+    <span class="eyebrow">Shooting · Research</span>
+    <h1>The Biomechanics of the Shot</h1>
+    <p class="dek">Why the elbow, knee, release point, balance and follow-through decide whether the ball goes in — and how CourtCoach turns each into a coachable target.</p>
+    <div class="byline">
+      <span class="status"><span class="dot"></span> Draft</span>
+      <span>July 2026</span>
+      <span>10 sources</span>
+    </div>
+
+    <div class="abstract">
+      <span class="lbl">Abstract</span>
+      <p style="margin:0;">Shooting is the most-studied skill in basketball, and it shows in the numbers. Of the four drills examined here &mdash; free throw, jump shot, three-pointer and layup &mdash; the free-throw knee bend and the three-point elbow angle are the only two metrics in the entire CourtCoach system that peer-reviewed kinematics confirm outright. This paper works through what pose tracking can and can't tell us about a shot across five signals: elbow angle, knee bend, release height, balance and follow-through. It documents the corrections the audit produced &mdash; widening two impossibly narrow jump-shot windows, nudging the three-point knee range up to meet the research, and dropping knee bend from the layup altogether &mdash; and it is candid about the limits: CourtCoach averages each angle across the whole shot rather than at release, and several metrics are unit-less scores no study can grade.</p>
+    </div>
+
+    <div class="toc">
+      <span class="lbl">Contents</span>
+      <ol>
+        <li><a href="#intro">Why shooting form is measurable</a></li>
+        <li><a href="#free-throw">Free Throw</a></li>
+        <li><a href="#jump-shot">Jump Shot</a></li>
+        <li><a href="#three">3-Point Shot</a></li>
+        <li><a href="#layup">Layup</a></li>
+        <li><a href="#limits">Limitations &amp; open questions</a></li>
+      </ol>
+    </div>
+
+    <!-- ── 1 ── -->
+    <h2 id="intro"><span class="h2num">01 /</span> Why shooting form is measurable</h2>
+    <p>A basketball shot is, mechanically, one of the most repeatable movements in sport &mdash; the same stance, the same arm path, the same release, rep after rep. That repeatability is exactly what makes it measurable. CourtCoach reads the interior angle at each joint from your phone's camera: the angle between the upper arm and forearm at the elbow, between the thigh and shank at the knee. A fully straight limb reads 180&deg;, and the number falls as the joint bends. This is the same convention biomechanics researchers use, so the figures below can be compared directly against published studies rather than translated first.</p>
+    <p>Shooting is also the one skill where those studies actually exist. Free throws and jump shots have been filmed and motion-captured for decades, so for these drills we can check our target ranges against real measured means and standard deviations. One catch shadows every angle on this page: CourtCoach averages each metric across the whole shot rather than isolating the instant of release. A shooter's elbow travels from roughly 80&deg; at the set point to nearly 180&deg; at full extension, so a whole-shot average lands somewhere in between &mdash; a useful coaching signal, but not the single-frame quantity a study reports. We flag that wherever it changes how a number should be read.</p>
+
+    <!-- ── 2 ── -->
+    <h2 id="free-throw"><span class="h2num">02 /</span> Free Throw</h2>
+    <p>The free throw is the most stable shot in the game &mdash; no jump, no defender, no clock &mdash; and it is the best-supported drill in CourtCoach. Its knee-bend target of 107&ndash;125&deg; is the single strongest number in the system: two independent motion-capture studies put a proficient shooter's preparatory knee flexion at about 113&deg; (&plusmn;9&deg;) and a less proficient shooter's at about 107&deg; (&plusmn;15&deg;), and our range sits squarely across that band [S1, S2]. It is the closest thing we have to a metric confirmed outright.</p>
+    <p>The elbow is slipperier. Coaching orthodoxy &mdash; Hal Wissel's B.E.E.F., for Balance, Elbow, Eyes, Follow-through &mdash; treats a tucked elbow as non-negotiable [S7], but the measured angle depends entirely on when you look: the elbow sits near 80&deg; at the set point and extends to roughly 160&deg; at release [S1]. Our 78&ndash;115&deg; window reflects a whole-shot reading rather than either endpoint, which is why we label it an estimate rather than a confirmed target. Release height and balance are app scores &mdash; higher and steadier is better, and the free throw carries the strictest balance floor of any drill because it is the only fully static shot [S6] &mdash; but neither has a physical unit a study could grade.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Free Throw</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">78–115°</td><td>68–125°</td><td>Prep-phase, S1 S2</td></tr>
+          <tr><td>Knee Bend</td><td class="val">107–125°</td><td>97–135°</td><td>Confirmed, S1 S2</td></tr>
+          <tr><td>Release Height</td><td class="val">112–117</td><td>108–122</td><td>App score</td></tr>
+          <tr><td>Balance</td><td class="val">75+</td><td>60+</td><td>App score, S6</td></tr>
+          <tr><td>Follow-Through</td><td class="val">65–79 /100</td><td>55–89</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <figure class="fig">
+      <div class="fig-ph">[ Figure placeholder — e.g. annotated free-throw pose with elbow &amp; knee angles ]</div>
+      <figcaption><b>Figure 1.</b> A free-throw set point: the shooting elbow tucked under the ball and the knee flexed to roughly 113&deg; &mdash; the preparatory angle proficient shooters converge on. [Replace with a real annotated frame.]</figcaption>
+    </figure>
+
+    <!-- ── 3 ── -->
+    <h2 id="jump-shot"><span class="h2num">03 /</span> Jump Shot</h2>
+    <p>The jump shot is where the old numbers needed the most work. CourtCoach originally asked for an elbow angle between 59&deg; and 65&deg; &mdash; a six-degree window. The research it was presumably drawn from does center there (one study reports a preparatory elbow angle of about 58&deg; for mid-range shots), but with a standard deviation near 17&deg;: real shooters range from roughly 40&deg; to 85&deg; [S2]. A six-degree target flags almost everyone as wrong, so we widened it to 45&ndash;80&deg;. The knee bend had the same problem in miniature &mdash; a two-degree window at 108&ndash;110&deg; against a measured spread of seven to nine degrees &mdash; and was widened to 100&ndash;125&deg;, which also brings it in line with the free throw [S2, S3].</p>
+    <p>Everything else on the jump shot is directionally sound but unproven. Release height rewards getting the ball up at the peak of the jump, which every coaching source endorses [S3], and Struzik and colleagues confirm that a real jump shot fires the legs at near-maximal power &mdash; with landing forces exceeding five times body weight &mdash; though that study measures force rather than any joint angle [S10]. Balance sits a little below the free throw's, reflecting that a jump inherently displaces the body more.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Jump Shot</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">45–80°</td><td>30–95°</td><td>Widened, S2</td></tr>
+          <tr><td>Knee Bend</td><td class="val">100–125°</td><td>90–135°</td><td>Widened, S2 S3</td></tr>
+          <tr><td>Release Height</td><td class="val">110+</td><td>105+</td><td>App score, S3</td></tr>
+          <tr><td>Balance</td><td class="val">70+</td><td>55+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">65–79 /100</td><td>55–89</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 4 ── -->
+    <h2 id="three"><span class="h2num">04 /</span> 3-Point Shot</h2>
+    <p>The three-pointer produced the single best-matched metric in the whole audit. Our elbow-angle target of 58&ndash;84&deg; lines up almost exactly with the measured preparatory mean of about 64&deg; (&plusmn;22&deg;) for shots behind the arc &mdash; both the center and the width match, which is rare [S2]. It is confirmed and untouched.</p>
+    <p>The knee bend needed a nudge. Studies put three-point preparatory knee flexion around 108&ndash;113&deg;, and our old window of 94&ndash;113&deg; undershot it &mdash; the whole range sat at or below the research mean rather than around it. We shifted it up to 100&ndash;122&deg;. Notably, distance-comparison work finds no significant kinematic difference between a three-pointer and a mid-range jump shot at these joints, which is why the two drills share their release-height and balance thresholds [S2].</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — 3-Point Shot</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">58–84°</td><td>48–94°</td><td>Confirmed, S2</td></tr>
+          <tr><td>Knee Bend</td><td class="val">100–122°</td><td>90–130°</td><td>Shifted up, S2</td></tr>
+          <tr><td>Release Height</td><td class="val">110+</td><td>105+</td><td>App score</td></tr>
+          <tr><td>Balance</td><td class="val">70+</td><td>55+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">65–79 /100</td><td>55–89</td><td>App score</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 5 ── -->
+    <h2 id="layup"><span class="h2num">05 /</span> Layup</h2>
+    <p>The layup forced a different kind of decision. A set shot has a stance you can compare against an ideal; a layup is a dynamic, one-footed takeoff taken on the move, and the knee sweeps through the entire range &mdash; deep flexion to load, near-full extension at the peak, flexion again to land &mdash; with no single &ldquo;correct&rdquo; value. The biomechanics literature that exists on layups measures knee and ankle angles precisely for that reason: to study landing impact and injury, not shooting form [S8, S9]. Compounding it, CourtCoach only ever tracks the right knee, which for a standard right-handed layup isn't even the plant leg.</p>
+    <p>So we dropped knee bend from the layup entirely and replaced it with Body Control &mdash; a measure of whether you stay upright and stacked over your hips through the drive rather than drifting sideways. It is an app score, not a research number, but it is a coachable one, and unlike the knee angle it actually means something for this move. Elbow angle is kept as a rough, extrapolated guide; release height and balance carry the lowest floors of any shooting drill, because a layup is a soft, close-range touch taken mid-stride, not a squared-up jump.</p>
+    <div class="tbl-wrap">
+      <table class="metrics">
+        <caption>CourtCoach targets — Layup</caption>
+        <thead><tr><th>Metric</th><th>Ideal</th><th>Acceptable</th><th>Basis</th></tr></thead>
+        <tbody>
+          <tr><td>Elbow Angle</td><td class="val">60–90°</td><td>50–100°</td><td>Extrapolated</td></tr>
+          <tr><td>Release Height</td><td class="val">100+</td><td>90+</td><td>App score</td></tr>
+          <tr><td>Balance</td><td class="val">65+</td><td>50+</td><td>App score</td></tr>
+          <tr><td>Follow-Through</td><td class="val">60–79 /100</td><td>50–89</td><td>App score</td></tr>
+          <tr><td>Body Control</td><td class="val">65+</td><td>50+</td><td>Replaces knee</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- ── 6 ── -->
+    <h2 id="limits"><span class="h2num">06 /</span> Limitations &amp; open questions</h2>
+    <p>Two honest limits run through everything above. The first is phase sampling: because CourtCoach averages across the whole shot instead of detecting the release frame, our angle targets are blended quantities, not the single-instant values the studies report. A release-instant detector is the most valuable upgrade on the horizon &mdash; it would let every angle metric be validated against the literature directly. The second is that balance, release height and follow-through are unit-less 0&ndash;100 scores; they rest on sound coaching principles, but no study can confirm a specific threshold. And a smaller limit specific to shooting: tracking only the right side of the body constrains how well we read left-handed shooters and asymmetric moves like the layup. None of this makes the coaching wrong &mdash; it marks exactly where the next round of evidence should go.</p>
+    <div class="note">
+      <span class="lbl">Methods note</span>
+      <p>Every target range on this page is the live value from CourtCoach's current build, and each verdict traces to the sources listed below. For the full method and the verdict on all 44 metrics across every skill, see the <a href="methodology.html">methodology paper</a>.</p>
+    </div>
+
+    <!-- ── References ── -->
+    <section class="refs">
+      <h2>References</h2>
+      <ol class="reflist">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10436204/" target="_blank" rel="noopener">Biomechanical characteristics of proficient free-throw shooters (Frontiers / PMC10436204)</a><span class="tag">Study</span><br><span class="supp">Elbow/knee angle at prep vs. release, proficient vs. non-proficient, markerless mocap.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9590067/" target="_blank" rel="noopener">Impact of Distance and Proficiency on Shooting Kinematics (PMC9590067)</a><span class="tag">Study</span><br><span class="supp">Prep-phase elbow/knee angles by shot distance and proficiency; confirms the angle convention.</span></li>
+        <li><a href="https://www.physio-pedia.com/Biomechanics_of_the_Basketball_Jump_Shot" target="_blank" rel="noopener">Biomechanics of the Basketball Jump Shot (Physiopedia)</a><span class="tag">Wiki</span><br><span class="supp">Elbow/knee flexion during prep; release-at-peak-jump guidance.</span></li>
+        <li><a href="https://www.breakthroughbasketball.com/fundamentals/shooting-arm-wrist-angle" target="_blank" rel="noopener">The Overlooked Importance of Arm &amp; Wrist Angles (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Wrist snap / follow-through coaching cues.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12121896/" target="_blank" rel="noopener">Arm Joint Coordination When Shooting Behind the 3-Point Line (PMC12121896)</a><span class="tag">Study</span><br><span class="supp">Shoulder→elbow→wrist coordination for 3-point shooting.</span></li>
+        <li><a href="https://coachdavelove.com/quantifying-stability-in-basketball-the-science-behind-optimal-stance-widths/" target="_blank" rel="noopener">Quantifying Stability in Basketball (Coach Dave Love)</a><span class="tag">Coaching</span><br><span class="supp">Base-of-support / stance-width basis for the Balance metric.</span></li>
+        <li><a href="https://www.coachesclipboard.net/WisselShootingMechanics.html" target="_blank" rel="noopener">Hal Wissel's Basketball Shooting Mechanics (Coach's Clipboard)</a><span class="tag">Coaching</span><br><span class="supp">B.E.E.F. framework; elbow-alignment guidance.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10618240/" target="_blank" rel="noopener">Ankle biomechanics of the three-step layup (PMC10618240)</a><span class="tag">Study</span><br><span class="supp">Confirms layup research targets landing mechanics, not shooting-form angle.</span></li>
+        <li><a href="https://www.mdpi.com/2673-7078/5/4/81" target="_blank" rel="noopener">Effects of Muscle Fatigue on Lower Extremity Biomechanics During the Layup (MDPI Biomechanics 2025)</a><span class="tag">Study</span><br><span class="supp">Knee mechanics vary non-monotonically across layup takeoff/landing phases.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4234772/" target="_blank" rel="noopener">Biomechanical Analysis of the Jump Shot in Basketball (Struzik et al., Journal of Human Kinetics, 2014)</a><span class="tag">Study</span><br><span class="supp">Jump-shot lower-limb power (~4837 W peak) and landing forces &gt;5× body weight. Measures power, not joint angles.</span></li>
+      </ol>
+    </section>
+  </div>
+</article>
+
+<footer>
+  <div class="wrap"><span class="foot-note">CourtCoach Research · Shooting — draft. Metric values current; prose is placeholder.</span></div>
+</footer>
+
+</body>
+</html>

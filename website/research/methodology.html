@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>How We Fact-Check Every Metric — CourtCoach Research</title>
+<style>
+  :root{
+    --bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;
+    --muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;
+    --accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;
+    --good:#2C7A54;--good-tint:#DCEFE4;--warn:#9A6B0C;--warn-tint:#F3E7C9;
+    --neutral:#5B6570;--neutral-tint:#E7E4DD;
+    --f-display:"Arial Narrow","Helvetica Neue",Helvetica,system-ui,sans-serif;
+    --f-body:ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;
+    --muted:#ADA595;--faint:#726B5C;--line:#2C261D;
+    --accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;
+    --good:#57BE8B;--good-tint:#17332A;--warn:#E0B24E;--warn-tint:#372D14;
+    --neutral:#9BA5AC;--neutral-tint:#242019;
+  }}
+  :root[data-theme="dark"]{--bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;--muted:#ADA595;--faint:#726B5C;--line:#2C261D;--accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;--good:#57BE8B;--good-tint:#17332A;--warn:#E0B24E;--warn-tint:#372D14;--neutral:#9BA5AC;--neutral-tint:#242019;}
+  :root[data-theme="light"]{--bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;--muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;--accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;--good:#2C7A54;--good-tint:#DCEFE4;--warn:#9A6B0C;--warn-tint:#F3E7C9;--neutral:#5B6570;--neutral-tint:#E7E4DD;}
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);line-height:1.66;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent-deep);}
+  .eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700;}
+
+  header.hubnav{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+  .hubnav-in{max-width:900px;margin:0 auto;padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;}
+  .hubnav .brand{display:flex;align-items:center;gap:.5rem;font-family:var(--f-display);font-weight:800;text-transform:uppercase;font-size:1.1rem;letter-spacing:.02em;color:var(--ink);text-decoration:none;}
+  .hubnav .brand .mark{width:20px;height:20px;border-radius:50%;background:var(--accent);position:relative;flex:none;}
+  .hubnav .brand .mark::before,.hubnav .brand .mark::after{content:"";position:absolute;background:var(--bg);opacity:.9;}
+  .hubnav .brand .mark::before{left:50%;top:0;width:1.4px;height:100%;transform:translateX(-50%);}
+  .hubnav .brand .mark::after{top:50%;left:0;height:1.4px;width:100%;transform:translateY(-50%);}
+  .hubnav .brand b{color:var(--accent);}
+  .hubnav .back{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-decoration:none;}
+  .hubnav .back:hover{color:var(--accent);}
+
+  .wrap{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
+  .masthead{padding:clamp(2.5rem,6vw,4rem) 0 1.6rem;}
+  h1{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:clamp(2.6rem,6.5vw,4.6rem);line-height:.92;letter-spacing:.006em;margin:.7rem 0 0;text-wrap:balance;}
+  .dek{font-size:1.22rem;color:var(--muted);max-width:60ch;margin:1.3rem 0 0;line-height:1.5;}
+  .byline{display:flex;flex-wrap:wrap;gap:1.2rem;margin:1.7rem 0 0;padding:1rem 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;color:var(--faint);}
+  .byline .status{display:inline-flex;align-items:center;gap:.4rem;color:var(--accent);}
+  .byline .status .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);}
+
+  .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin:2rem 0;}
+  .strip .s{background:var(--surface);padding:1.1rem 1rem;}
+  .strip .n{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:1.9rem;font-weight:600;line-height:1;}
+  .strip .l{font-family:var(--f-display);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-top:.4rem;display:block;}
+  .strip .confirmed .n{color:var(--good);}
+  .strip .corrected .n{color:var(--warn);}
+  .strip .estimate .n{color:var(--neutral);}
+  .strip .redefined .n{color:var(--accent);}
+  @media(max-width:560px){.strip{grid-template-columns:repeat(2,1fr);}}
+
+  nav.jump{display:flex;gap:.4rem;flex-wrap:wrap;margin:0 0 2.4rem;}
+  nav.jump a{font-family:var(--f-mono);font-size:.74rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase;text-decoration:none;color:var(--muted);background:var(--surface);border:1px solid var(--line);padding:.4rem .8rem;border-radius:999px;}
+  nav.jump a:hover{border-color:var(--accent);color:var(--accent);}
+
+  section.block{margin:3rem 0;}
+  .block-head{display:flex;align-items:baseline;justify-content:space-between;gap:1rem;border-bottom:1px solid var(--line);padding-bottom:.6rem;margin-bottom:1.3rem;}
+  h2{font-family:var(--f-display);text-transform:uppercase;font-weight:700;font-size:1.7rem;letter-spacing:.01em;margin:0;}
+  .block-note{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);white-space:nowrap;}
+  p{font-size:1.1rem;margin:1rem 0;}
+  .lead{font-size:1.15rem;}
+
+  .steps{display:flex;flex-direction:column;gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  .step{display:grid;grid-template-columns:2.4rem 1fr;gap:1rem;padding:1.2rem 1.3rem;background:var(--surface);border-bottom:1px solid var(--line);}
+  .step:last-child{border-bottom:none;}
+  .step .num{font-family:var(--f-mono);font-size:.85rem;font-weight:700;color:var(--accent);padding-top:.15rem;}
+  .step h3{font-family:var(--f-display);text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;margin:0 0 .3rem;}
+  .step p{margin:0;font-size:1rem;color:var(--muted);}
+  .step p.body{color:var(--ink);}
+
+  .rubric{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:1.4rem 0;}
+  @media(max-width:600px){.rubric{grid-template-columns:1fr;}}
+  .rubric .r{background:var(--surface);padding:1.2rem 1.3rem;}
+  .rubric .r .v{margin-bottom:.5rem;}
+  .rubric .r p{margin:0;font-size:.98rem;color:var(--muted);}
+
+  .v{display:inline-flex;align-items:center;gap:.4rem;font-family:var(--f-mono);font-size:.66rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:.28rem .6rem;border-radius:999px;white-space:nowrap;}
+  .v.confirmed{background:var(--good-tint);color:var(--good);}
+  .v.corrected{background:var(--warn-tint);color:var(--warn);}
+  .v.estimate{background:var(--neutral-tint);color:var(--neutral);}
+  .v.redefined{background:var(--accent-tint);color:var(--accent-deep);}
+
+  .callout{background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:10px;padding:1.2rem 1.4rem;margin:1.6rem 0;}
+  .callout .lbl{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);font-weight:700;display:block;margin-bottom:.5rem;}
+  .callout p{margin:.3rem 0 0;font-size:1.02rem;color:var(--ink);}
+
+  .drill-title{font-family:var(--f-display);text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;margin:1.8rem 0 .5rem;color:var(--ink);}
+  .tbl-wrap{overflow-x:auto;}
+  table.verd{width:100%;border-collapse:collapse;font-family:var(--f-mono);font-size:.85rem;}
+  table.verd th,table.verd td{text-align:left;padding:.55rem .7rem;border-bottom:1px solid var(--line);vertical-align:middle;}
+  table.verd thead th{color:var(--faint);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;border-bottom:1.5px solid var(--line);}
+  table.verd td.metric{font-family:var(--f-body);font-size:.98rem;font-weight:600;}
+  table.verd td.target{color:var(--accent-deep);font-weight:600;white-space:nowrap;}
+  table.verd td.basis{color:var(--muted);font-size:.78rem;}
+
+  ol.reflist,ul.reflist{list-style:none;margin:1.1rem 0 0;padding:0;display:flex;flex-direction:column;gap:.6rem;}
+  .refgroup h3{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin:1.6rem 0 .3rem;}
+  ol.reflist{counter-reset:r;}
+  ol.reflist li{counter-increment:r;display:grid;grid-template-columns:2.2rem 1fr;gap:.5rem;font-size:.92rem;line-height:1.4;}
+  ol.reflist.sh li::before{content:"S" counter(r);}
+  ol.reflist.pa li::before{content:"P" counter(r);}
+  ol.reflist.dr li::before{content:"D" counter(r);}
+  ol.reflist li::before{font-family:var(--f-mono);font-size:.74rem;color:var(--accent);font-weight:700;padding-top:.15rem;}
+  ol.reflist a{color:var(--accent-deep);text-decoration:none;}
+  ol.reflist a:hover{text-decoration:underline;}
+  ol.reflist .tag{font-family:var(--f-mono);font-size:.6rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);border-radius:3px;padding:.05rem .35rem;margin-left:.3rem;white-space:nowrap;}
+  ol.reflist .supp{color:var(--muted);font-style:italic;}
+  .discard{font-family:var(--f-mono);font-size:.82rem;color:var(--muted);margin-top:1rem;padding-top:.8rem;border-top:1px dashed var(--line);}
+  .discard b{color:var(--accent-deep);}
+
+  footer{border-top:1px solid var(--line);margin-top:3rem;padding-top:1.5rem;font-family:var(--f-mono);font-size:.74rem;color:var(--faint);line-height:1.6;}
+</style>
+</head>
+<body>
+
+<header class="hubnav">
+  <div class="hubnav-in">
+    <a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span> Court<b>Coach</b></a>
+    <a class="back" href="index.html">← All research</a>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="masthead">
+    <span class="eyebrow">CourtCoach Research · Methodology</span>
+    <h1>How We Fact-Check Every Metric</h1>
+    <p class="dek">CourtCoach turns body angles into coaching. This paper documents how we validate every target range against the evidence — the measurement model, the verdict rubric, and the honest reasons most metrics land as estimates rather than proven numbers.</p>
+    <div class="byline">
+      <span class="status"><span class="dot"></span> Published</span>
+      <span>44 metrics · 3 skills</span>
+      <span>24 sources</span>
+    </div>
+  </div>
+
+  <div class="strip">
+    <div class="s confirmed"><span class="n">2</span><span class="l">Confirmed by research</span></div>
+    <div class="s corrected"><span class="n">9</span><span class="l">Corrected</span></div>
+    <div class="s estimate"><span class="n">32</span><span class="l">Coaching-based estimate</span></div>
+    <div class="s redefined"><span class="n">1</span><span class="l">Redefined</span></div>
+  </div>
+
+  <nav class="jump">
+    <a href="#method">The method</a>
+    <a href="#rubric">Verdict rubric</a>
+    <a href="#shooting">Shooting verdicts</a>
+    <a href="#passing">Passing verdicts</a>
+    <a href="#dribbling">Dribbling verdicts</a>
+    <a href="#sources">Sources</a>
+  </nav>
+
+  <!-- ============ METHOD ============ -->
+  <section class="block" id="method">
+    <div class="block-head"><h2>The method</h2></div>
+    <p class="lead">Every metric was put through the same four steps. The goal was never to make the app look finished — it was to know, honestly, which numbers the evidence supports and which are educated defaults.</p>
+    <div class="steps">
+      <div class="step">
+        <span class="num">01</span>
+        <div>
+          <h3>Define what's measured</h3>
+          <p class="body">CourtCoach reads the interior joint angle from pose tracking — 180° is a fully straight limb, smaller means more bend — which matches the convention used in the biomechanics literature, so published numbers are directly comparable. Metrics like Balance, Release Height, Hand Position and Body Lean are 0–100 app scores with no physical unit.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <div>
+          <h3>Gather the evidence</h3>
+          <p class="body">Three parallel research passes — one per skill — pulled 24 usable sources: 8 peer-reviewed studies, 2 academic papers, and 14 coaching resources. Each source was read for what it actually measures, and sources that couldn't be verified were dropped (one fabricated figure was caught and discarded).</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <div>
+          <h3>Assign a verdict</h3>
+          <p class="body">Each metric's target range was compared against the evidence and given one of four verdicts (below). Where the range was wrong, we corrected it in the app; where no research exists, we labeled it an estimate rather than dressing it up as fact.</p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="num">04</span>
+        <div>
+          <h3>Apply and document</h3>
+          <p class="body">All corrections in this paper are already live in the CourtCoach build — the tables below show final values, not proposals. This document is the permanent record of why each threshold is what it is.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="lbl">Two limits that touch every number</span>
+      <p><b>Phase sampling.</b> Metrics are averaged across the whole rep, not isolated to the instant of release — so an angle blends the set-point, the release and the follow-through, which can differ by 70–100°. And <b>app scores</b> (Balance, Release Height, Hand Position, Body Lean) have no real-world unit, so no study can confirm a specific threshold. Both are honest constraints, noted wherever they matter.</p>
+    </div>
+  </section>
+
+  <!-- ============ RUBRIC ============ -->
+  <section class="block" id="rubric">
+    <div class="block-head"><h2>The verdict rubric</h2></div>
+    <div class="rubric">
+      <div class="r"><span class="v confirmed">Confirmed</span><p>The current range matches peer-reviewed measurements. Kept as-is.</p></div>
+      <div class="r"><span class="v corrected">Corrected</span><p>The range or label was wrong or contradicted the evidence, and has been fixed in the app.</p></div>
+      <div class="r"><span class="v estimate">Estimate</span><p>No hard research exists — an app score, or an under-studied skill. The threshold is an engineering default backed by coaching cues.</p></div>
+      <div class="r"><span class="v redefined">Redefined</span><p>The metric didn't make sense for the drill and was replaced with one that does.</p></div>
+    </div>
+    <div class="callout">
+      <span class="lbl">Why "Estimate" is the majority verdict</span>
+      <p>32 of 44 metrics are estimates — and that's by design, not by failure. Balance, Release Height, Hand Position and Body Lean are invented 0–100 scores no study can grade, and passing and dribbling are genuinely under-researched compared to shooting. An estimate here is an <em>honestly-labeled</em> threshold built from coaching consensus, ready to be upgraded the moment better data exists. Calling it anything more certain would be the dishonest choice.</p>
+    </div>
+  </section>
+
+  <!-- ============ SHOOTING ============ -->
+  <section class="block" id="shooting">
+    <div class="block-head"><h2>Shooting verdicts</h2><span class="block-note">best-supported skill · S1–S10</span></div>
+    <p>Shooting has more usable biomechanics research than any other skill, so it carries both of the paper's <span class="v confirmed">Confirmed</span> verdicts and most of the evidence-based corrections.</p>
+
+    <div class="drill-title">Free Throw</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">78–115°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Phase-ambiguous · S1 S2</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">107–125°</td><td><span class="v confirmed">Confirmed</span></td><td class="basis">Matches prep-phase means · S1 S2</td></tr>
+        <tr><td class="metric">Release Height</td><td class="target">112–117 /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · S6</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">75+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · S6</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">65–79 /100</td><td><span class="v corrected">Corrected</span></td><td class="basis">Relabeled °→/100</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Jump Shot</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">45–80°</td><td><span class="v corrected">Corrected</span></td><td class="basis">Widened from 59–65° (SD ~17°) · S2</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">100–125°</td><td><span class="v corrected">Corrected</span></td><td class="basis">Widened from 108–110° · S2 S3</td></tr>
+        <tr><td class="metric">Release Height</td><td class="target">110+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · S3</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">65–79 /100</td><td><span class="v corrected">Corrected</span></td><td class="basis">Relabeled °→/100</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">3-Point Shot</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">58–84°</td><td><span class="v confirmed">Confirmed</span></td><td class="basis">Best-matched range in the audit · S2</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">100–122°</td><td><span class="v corrected">Corrected</span></td><td class="basis">Shifted up ~10° to meet means · S2</td></tr>
+        <tr><td class="metric">Release Height</td><td class="target">110+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">65–79 /100</td><td><span class="v corrected">Corrected</span></td><td class="basis">Relabeled °→/100</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Layup</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">60–90°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Extrapolated</td></tr>
+        <tr><td class="metric">Release Height</td><td class="target">100+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">65+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">60–79 /100</td><td><span class="v corrected">Corrected</span></td><td class="basis">Relabeled °→/100</td></tr>
+        <tr><td class="metric">Body Control</td><td class="target">65+ /100</td><td><span class="v redefined">Redefined</span></td><td class="basis">Replaced meaningless knee bend · S8 S9</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ PASSING ============ -->
+  <section class="block" id="passing">
+    <div class="block-head"><h2>Passing verdicts</h2><span class="block-note">thin research · P1–P7</span></div>
+    <p>No study anywhere quantifies a target elbow or knee angle for a pass. Passing is almost entirely <span class="v estimate">Estimate</span> territory — with one clear, evidence-based correction.</p>
+
+    <div class="drill-title">Chest Pass</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">80–100°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Coaching cue · P3 P4</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">130–155°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Stance proxy · P2</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">75+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Bounce Pass</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">80–100°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Coaching cue</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">130–155°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Stance proxy</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">75+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">65+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Overhead Pass</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Elbow Angle</td><td class="target">85–95°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Coaching cue</td></tr>
+        <tr><td class="metric">Knee Bend</td><td class="target">130–155°</td><td><span class="v corrected">Corrected</span></td><td class="basis">Unified from 145–165° (was backwards) · P5 P6 P7</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Follow-Through</td><td class="target">75+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ DRIBBLING ============ -->
+  <section class="block" id="dribbling">
+    <div class="block-head"><h2>Dribbling verdicts</h2><span class="block-note">least-studied · D1–D7</span></div>
+    <p>The weakest-supported skill: only one low-rigor source gives a measured dribble knee angle. Dribbling is nearly all coaching-cue <span class="v estimate">Estimate</span>, plus one correction.</p>
+
+    <div class="drill-title">Crossover</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Knee Bend</td><td class="target">100–133°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Cue + weak datapoint · D7</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">80+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Hand Position</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · D2 D3</td></tr>
+        <tr><td class="metric">Body Lean</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · D3</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Between the Legs</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Knee Bend</td><td class="target">100–133°</td><td><span class="v corrected">Corrected</span></td><td class="basis">Unified from 90–110° (was backwards) · D5</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">80+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Hand Position</td><td class="target">65+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Body Lean</td><td class="target">65+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+      </tbody>
+    </table></div>
+
+    <div class="drill-title">Ball Handling</div>
+    <div class="tbl-wrap"><table class="verd">
+      <thead><tr><th>Metric</th><th>Final target</th><th>Verdict</th><th>Basis</th></tr></thead>
+      <tbody>
+        <tr><td class="metric">Knee Bend</td><td class="target">100–133°</td><td><span class="v estimate">Estimate</span></td><td class="basis">Cue + analogue · D4 D7</td></tr>
+        <tr><td class="metric">Balance</td><td class="target">80+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+        <tr><td class="metric">Hand Position</td><td class="target">75+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score · D4</td></tr>
+        <tr><td class="metric">Body Lean</td><td class="target">70+ /100</td><td><span class="v estimate">Estimate</span></td><td class="basis">App score</td></tr>
+      </tbody>
+    </table></div>
+  </section>
+
+  <!-- ============ SOURCES ============ -->
+  <section class="block" id="sources">
+    <div class="block-head"><h2>Sources</h2><span class="block-note">24 cited · 1 discarded</span></div>
+
+    <div class="refgroup">
+      <h3>Shooting — S1–S10</h3>
+      <ol class="reflist sh">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10436204/" target="_blank" rel="noopener">Biomechanical characteristics of proficient free-throw shooters (Frontiers / PMC10436204)</a><span class="tag">Study</span><br><span class="supp">Elbow/knee angle at prep vs. release, proficient vs. non-proficient, markerless mocap.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9590067/" target="_blank" rel="noopener">Impact of Distance and Proficiency on Shooting Kinematics (PMC9590067)</a><span class="tag">Study</span><br><span class="supp">Prep-phase elbow/knee angles by distance and proficiency; confirms the angle convention.</span></li>
+        <li><a href="https://www.physio-pedia.com/Biomechanics_of_the_Basketball_Jump_Shot" target="_blank" rel="noopener">Biomechanics of the Basketball Jump Shot (Physiopedia)</a><span class="tag">Wiki</span><br><span class="supp">Elbow/knee flexion during prep; release-at-peak-jump guidance.</span></li>
+        <li><a href="https://www.breakthroughbasketball.com/fundamentals/shooting-arm-wrist-angle" target="_blank" rel="noopener">The Overlooked Importance of Arm &amp; Wrist Angles (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Wrist snap / follow-through coaching cues.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC12121896/" target="_blank" rel="noopener">Arm Joint Coordination When Shooting Behind the 3-Point Line (PMC12121896)</a><span class="tag">Study</span><br><span class="supp">Shoulder→elbow→wrist coordination for 3-point shooting.</span></li>
+        <li><a href="https://coachdavelove.com/quantifying-stability-in-basketball-the-science-behind-optimal-stance-widths/" target="_blank" rel="noopener">Quantifying Stability in Basketball (Coach Dave Love)</a><span class="tag">Coaching</span><br><span class="supp">Base-of-support / stance-width basis for the Balance metric.</span></li>
+        <li><a href="https://www.coachesclipboard.net/WisselShootingMechanics.html" target="_blank" rel="noopener">Hal Wissel's Basketball Shooting Mechanics (Coach's Clipboard)</a><span class="tag">Coaching</span><br><span class="supp">B.E.E.F. framework; elbow-alignment guidance.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10618240/" target="_blank" rel="noopener">Ankle biomechanics of the three-step layup (PMC10618240)</a><span class="tag">Study</span><br><span class="supp">Confirms layup research targets landing mechanics, not shooting-form angle.</span></li>
+        <li><a href="https://www.mdpi.com/2673-7078/5/4/81" target="_blank" rel="noopener">Effects of Muscle Fatigue on Lower Extremity Biomechanics During the Layup (MDPI Biomechanics 2025)</a><span class="tag">Study</span><br><span class="supp">Knee mechanics vary non-monotonically across layup takeoff/landing phases.</span></li>
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4234772/" target="_blank" rel="noopener">Biomechanical Analysis of the Jump Shot in Basketball (Struzik et al., Journal of Human Kinetics, 2014)</a><span class="tag">Study</span><br><span class="supp">Jump-shot lower-limb power and landing forces &gt;5× body weight. Measures power, not joint angles.</span></li>
+      </ol>
+    </div>
+
+    <div class="refgroup">
+      <h3>Passing — P1–P7</h3>
+      <ol class="reflist pa">
+        <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7830610/" target="_blank" rel="noopener">Influence of Fatigue on Kinematic Parameters of Basketball Passing (IJERPH 2021)</a><span class="tag">Study</span><br><span class="supp">Only passing-specific peer-reviewed study; reports angular velocity, not release-angle degrees.</span></li>
+        <li><a href="https://www.researchgate.net/publication/299594283" target="_blank" rel="noopener">Influence of Athletic Stance Height/Width on Response Time in Basketball (ResearchGate)</a><span class="tag">Study</span><br><span class="supp">General stance knee-flexion data — closest proxy for passing knee-bend plausibility.</span></li>
+        <li><a href="https://pgcbasketball.com/blog/key-basketball-skill-bent-elbow-pass/" target="_blank" rel="noopener">Basketball Passing Skill: Bent Elbow Pass (PGC Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Standard chest pass ends in a full-extension delivery point.</span></li>
+        <li><a href="https://hoopstudent.com/basketball-chest-pass/" target="_blank" rel="noopener">Chest Pass in Basketball: General Information (HoopStudent)</a><span class="tag">Coaching</span><br><span class="supp">Elbows straighten from a bent start at release.</span></li>
+        <li><a href="https://www.sportplan.net/drills/Basketball/Passing-Technique/Body-Position-for-Passing-Basket115.jsp" target="_blank" rel="noopener">Body Position for Passing (Sportplan)</a><span class="tag">Coaching</span><br><span class="supp">Generic "bend your knees" cue applied undifferentiated across pass types.</span></li>
+        <li><a href="https://hoopsking.com/blogs/default-blog/master-how-to-throw-overhead-pass-basketball-expert-guide" target="_blank" rel="noopener">Master How to Throw Overhead Pass Basketball (HoopsKing)</a><span class="tag">Coaching</span><br><span class="supp">Overhead-pass elbow/knee cues; basis for the knee-range correction.</span></li>
+        <li><a href="https://www.thehoopsgeek.com/basketball-outlet-pass/" target="_blank" rel="noopener">The Outlet Pass: A Basketball Coach's Guide (TheHoopsGeek)</a><span class="tag">Coaching</span><br><span class="supp">Leg-power generation for the overhead/outlet pass — no straighter-stance mention.</span></li>
+      </ol>
+    </div>
+
+    <div class="refgroup">
+      <h3>Dribbling — D1–D7</h3>
+      <ol class="reflist dr">
+        <li><a href="https://www.breakthroughbasketball.com/defense/stance" target="_blank" rel="noopener">Basketball Defense: 10 Keys to a Great Defensive Stance (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Generic athletic/defensive stance cues, no degree figures.</span></li>
+        <li><a href="https://www.breakthroughbasketball.com/training/beginner-crossover.html" target="_blank" rel="noopener">Beginner Drills To Develop An Effective Crossover Move (Breakthrough Basketball)</a><span class="tag">Coaching</span><br><span class="supp">Crossover stance depth, ball-below-knees cue.</span></li>
+        <li><a href="https://xbotgo.com/blogs/knowledge/crossover-dribble" target="_blank" rel="noopener">How to Do a Crossover Dribble (XbotGo)</a><span class="tag">Coaching</span><br><span class="supp">Crossover stance, ball height, lean/shoulder-drop misdirection cue.</span></li>
+        <li><a href="https://joinstriveon.com/blog/basketball-dribbling-drills" target="_blank" rel="noopener">Basketball Dribbling Drills: 15 Drills for Every Level (joinstriveon.com)</a><span class="tag">Coaching</span><br><span class="supp">USA Basketball "waist-high or lower" cue; stationary-drill knee-depth correction.</span></li>
+        <li><a href="https://www.sporator.com/basketball-defensive-stance/" target="_blank" rel="noopener">Fundamentals of Good Basketball Defensive Stance and Footwork (Sporator)</a><span class="tag">Coaching</span><br><span class="supp">The one explicit generic stance figure (~45° knee bend), used as a reference point.</span></li>
+        <li><a href="https://ojs.ub.uni-konstanz.de/cpa/article/view/6030" target="_blank" rel="noopener">Biomechanical Study on a Basketball Dribble with a Cutting Motion (ISBS / Uni Konstanz)</a><span class="tag">Paper</span><br><span class="supp">Peer-reviewed crossover-type study; measures center-of-gravity velocity, not joint angles.</span></li>
+        <li><a href="https://www.academia.edu/1264533" target="_blank" rel="noopener">Kinematic Analysis of Low Dribble at Execution Phase (Pandey &amp; Patel, Golden Research Thoughts, 2012)</a><span class="tag">Paper · low-rigor</span><br><span class="supp">Only source with a measured dribble knee angle (103.85° ± 18.95°, n=20). Non-indexed journal — weak support only.</span></li>
+      </ol>
+      <p class="discard"><b>Discarded:</b> gym-mikolo.com "The Quarter Squat" — a search summary attributed a "110–140°" figure to this page that it does not contain. Caught fabrication; excluded from all evidence.</p>
+    </div>
+  </section>
+
+  <footer>
+    CourtCoach Research · Methodology. Verdicts and corrections reflect the current app build. Point-in-time synthesis — not a substitute for a sports scientist's review; re-verify before shipping further threshold changes.
+  </footer>
+
+</div>
+
+</body>
+</html>
