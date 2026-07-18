@@ -16,6 +16,7 @@ import { getRealtimeTip } from '../services/claude';
 import { speak } from '../services/speech';
 import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
 import PoseCamera from '../components/PoseCamera';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 const PAUSE_BETWEEN_TIPS_MS = 3000;
 const SCAN_DELAY_MS = 4000; // time to let camera + pose model initialise before first tip
@@ -200,7 +201,9 @@ export default function CameraScreen() {
         ) : null}
 
         <View style={styles.controls}>
-          <Button title="Done" onPress={navigateToFeedback} />
+          <TouchableOpacity style={styles.doneBtn} onPress={navigateToFeedback} activeOpacity={0.85}>
+            <Text style={styles.doneBtnText}>Done →</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -292,28 +295,40 @@ const styles = StyleSheet.create({
     position: 'absolute', top: 60, alignSelf: 'center',
     backgroundColor: 'rgba(0,0,0,0.6)',
     paddingHorizontal: 16, paddingVertical: 8,
-    borderRadius: 12, alignItems: 'center', gap: 2,
+    borderRadius: RADIUS.chip, alignItems: 'center', gap: 2,
+    borderWidth: 1, borderColor: 'rgba(232,72,26,0.5)',
   },
-  drillText:    { color: 'white', fontSize: 18, fontWeight: '600' },
-  drillSubtext: { color: 'rgba(255,255,255,0.8)', fontSize: 13 },
+  drillText:    { color: 'white', fontFamily: MONO, fontSize: 15, fontWeight: '700', letterSpacing: 1, textTransform: 'uppercase' },
+  drillSubtext: { color: C.accent, fontFamily: MONO, fontSize: 12, fontWeight: '700', letterSpacing: 0.5 },
 
   metricsToggle: {
     position: 'absolute', top: 60, right: 16,
     backgroundColor: 'rgba(0,0,0,0.6)',
-    paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10,
+    paddingHorizontal: 12, paddingVertical: 8, borderRadius: RADIUS.chip,
   },
-  metricsToggleText: { color: 'white', fontSize: 13, fontWeight: '600' },
+  metricsToggleText: { color: 'white', fontFamily: MONO, fontSize: 11, fontWeight: '700', letterSpacing: 0.8, textTransform: 'uppercase' },
 
   metricsOverlay: {
     position: 'absolute', top: 110, right: 16,
-    backgroundColor: 'rgba(0,0,0,0.75)',
-    borderRadius: 14, padding: 14, gap: 10, minWidth: 220,
+    backgroundColor: 'rgba(0,0,0,0.78)',
+    borderRadius: RADIUS.card, padding: 14, gap: 10, minWidth: 220,
+    borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
   },
   metricRow:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 },
-  metricLabel:{ color: 'rgba(255,255,255,0.8)', fontSize: 13, flex: 1 },
+  metricLabel:{ color: 'rgba(255,255,255,0.75)', fontFamily: MONO, fontSize: 11, letterSpacing: 0.5, textTransform: 'uppercase', flex: 1 },
   metricRight:{ alignItems: 'flex-end' },
-  metricValue:{ fontSize: 15, fontWeight: '700' },
-  metricIdeal:{ color: 'rgba(255,255,255,0.4)', fontSize: 10 },
+  metricValue:{ fontFamily: MONO, fontSize: 16, fontWeight: '700' },
+  metricIdeal:{ color: 'rgba(255,255,255,0.4)', fontFamily: MONO, fontSize: 10 },
+
+  doneBtn: {
+    backgroundColor: C.accent,
+    paddingHorizontal: 44, paddingVertical: 14,
+    borderRadius: RADIUS.button,
+  },
+  doneBtnText: {
+    color: C.white, fontFamily: MONO, fontSize: 15, fontWeight: '700',
+    letterSpacing: 1, textTransform: 'uppercase',
+  },
 
   controls: {
     position: 'absolute', bottom: 50, width: '100%',

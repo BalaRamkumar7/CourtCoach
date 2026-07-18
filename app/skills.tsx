@@ -1,6 +1,6 @@
 import { router } from 'expo-router';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 const SKILLS = [
   { key: 'shooting', label: 'Shooting', emoji: '🏀', desc: 'Free throws, jump shots, layups & more' },
@@ -16,6 +16,7 @@ export default function SkillsScreen() {
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
 
+        <Text style={styles.eyebrow}>Pick your skill</Text>
         <Text style={styles.title}>Choose a Skill</Text>
         <Text style={styles.subtitle}>What do you want to work on today?</Text>
 
@@ -57,16 +58,30 @@ const styles = StyleSheet.create({
   },
 
   backText: {
-    fontSize: 16,
-    color: C.primary,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 13,
+    color: C.accent,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+
+  eyebrow: {
+    fontFamily: MONO,
+    fontSize: 12,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    color: C.accent,
+    fontWeight: '700',
+    marginBottom: 6,
   },
 
   title: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -0.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
     marginBottom: 6,
   },
 
@@ -82,17 +97,13 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: C.card,
-    borderRadius: 16,
+    borderRadius: RADIUS.card,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 16,
     borderWidth: 1,
     borderColor: C.border,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
   },
 
   cardEmoji: {
@@ -105,9 +116,11 @@ const styles = StyleSheet.create({
   },
 
   cardLabel: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: 19,
+    fontWeight: '800',
     color: C.text,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
 
   cardDesc: {
@@ -116,7 +129,8 @@ const styles = StyleSheet.create({
   },
 
   chevron: {
-    fontSize: 22,
-    color: C.textTertiary,
+    fontSize: 24,
+    color: C.accent,
+    fontWeight: '700',
   },
 });

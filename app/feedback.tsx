@@ -14,7 +14,7 @@ import { getSessionSummary, SessionSummary } from '../services/claude';
 import { speak } from '../services/speech';
 import { useSession } from '../context/sessioncontext';
 import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 const STATUS_COLOR = {
   good: C.success,
@@ -24,18 +24,18 @@ const STATUS_COLOR = {
 
 const RATING_STYLE: Record<string, object> = {
   Excellent: { backgroundColor: C.successLight },
-  Good: { backgroundColor: C.primaryLight },
-  'Almost There': { backgroundColor: C.skyLight },
-  Moderate: { backgroundColor: C.warningLight },
+  Good: { backgroundColor: C.accentTint },
+  'Almost There': { backgroundColor: C.warningLight },
+  Moderate: { backgroundColor: C.borderLight },
   Developing: { backgroundColor: C.dangerLight },
 };
 
 const RATING_TEXT: Record<string, object> = {
-  Excellent: { color: '#166534' },
-  Good: { color: '#1e40af' },
-  'Almost There': { color: '#0369a1' },
-  Moderate: { color: '#854d0e' },
-  Developing: { color: '#991b1b' },
+  Excellent: { color: '#1F6B47' },
+  Good: { color: C.accentDeep },
+  'Almost There': { color: '#8A5A12' },
+  Moderate: { color: C.textSecondary },
+  Developing: { color: '#8E2A20' },
 };
 
 export default function FeedbackScreen() {
@@ -92,8 +92,8 @@ export default function FeedbackScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Session Complete</Text>
         <Text style={styles.drillName}>{drill ?? 'Drill'}</Text>
+        <Text style={styles.title}>Session Complete</Text>
 
         {/* Rating badge */}
         {rating && (
@@ -183,27 +183,35 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -0.5,
-    marginBottom: 2,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
+    marginBottom: 4,
   },
 
   drillName: {
-    fontSize: 17,
-    color: C.textSecondary,
-    marginBottom: 4,
+    fontFamily: MONO,
+    fontSize: 12,
+    color: C.accent,
+    fontWeight: '700',
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    marginBottom: 6,
   },
 
   ratingBadge: {
     alignSelf: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
     borderRadius: 999,
     marginBottom: 4,
   },
 
   ratingText: {
-    fontSize: 15,
+    fontFamily: MONO,
+    fontSize: 13,
     fontWeight: '700',
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
   },
 
   loadingBox: {
@@ -242,16 +250,17 @@ const styles = StyleSheet.create({
   },
 
   encourageCard: {
-    backgroundColor: C.primaryLight,
-    borderColor: '#bfdbfe',
+    backgroundColor: C.accentTint,
+    borderColor: '#F2C9B5',
   },
 
   cardLabel: {
+    fontFamily: MONO,
     fontSize: 11,
     fontWeight: '700',
-    color: C.textSecondary,
+    color: C.accent,
     textTransform: 'uppercase',
-    letterSpacing: 0.6,
+    letterSpacing: 1,
   },
 
   cardText: {
@@ -261,9 +270,11 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: C.text,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
     marginTop: 4,
   },
 
@@ -284,17 +295,19 @@ const styles = StyleSheet.create({
 
   metricLabel: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: '700',
     color: C.text,
   },
 
   metricIdeal: {
+    fontFamily: MONO,
     fontSize: 11,
     color: C.textTertiary,
     marginTop: 1,
   },
 
   metricValue: {
+    fontFamily: MONO,
     fontSize: 18,
     fontWeight: '700',
   },
@@ -310,10 +323,11 @@ const styles = StyleSheet.create({
   },
 
   tipNumber: {
+    fontFamily: MONO,
     fontSize: 12,
     fontWeight: '700',
-    color: C.textTertiary,
-    width: 20,
+    color: C.accent,
+    width: 22,
     marginTop: 2,
   },
 
@@ -326,7 +340,7 @@ const styles = StyleSheet.create({
 
   endBtn: {
     backgroundColor: C.text,
-    borderRadius: 16,
+    borderRadius: RADIUS.button,
     paddingVertical: 18,
     alignItems: 'center',
     marginTop: 8,
@@ -334,7 +348,10 @@ const styles = StyleSheet.create({
 
   endBtnText: {
     color: C.white,
-    fontSize: 18,
+    fontFamily: MONO,
+    fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

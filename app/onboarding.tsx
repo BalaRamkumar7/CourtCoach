@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import {
+  SafeAreaView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,6 +10,7 @@ import {
 
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 const SLIDES = [
   {
@@ -40,21 +42,25 @@ export default function OnboardingScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.slide}>
+        <Text style={styles.step}>
+          {String(index + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
+        </Text>
         <Text style={styles.title}>{slide.title}</Text>
         <Text style={styles.body}>{slide.body}</Text>
 
         {isLast ? (
-          <TouchableOpacity style={styles.ctaButton} onPress={handleGetStarted}>
-            <Text style={styles.ctaText}>Get Started</Text>
+          <TouchableOpacity style={styles.ctaButton} onPress={handleGetStarted} activeOpacity={0.85}>
+            <Text style={styles.ctaText}>Get Started →</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
-            style={styles.nextButton}
+            style={styles.ctaButton}
             onPress={() => setIndex((i) => i + 1)}
+            activeOpacity={0.85}
           >
-            <Text style={styles.nextText}>Next</Text>
+            <Text style={styles.ctaText}>Next</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -64,14 +70,14 @@ export default function OnboardingScreen() {
           <View key={i} style={[styles.dot, i === index && styles.dotActive]} />
         ))}
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: C.bg,
   },
 
   slide: {
@@ -79,49 +85,49 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
-    gap: 24,
+    gap: 20,
+  },
+
+  step: {
+    fontFamily: MONO,
+    fontSize: 13,
+    letterSpacing: 2,
+    color: C.accent,
+    fontWeight: '700',
   },
 
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 34,
+    fontWeight: '800',
     textAlign: 'center',
-    color: '#111',
+    color: C.text,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
 
   body: {
-    fontSize: 18,
+    fontSize: 17,
     textAlign: 'center',
-    color: '#6b7280',
-    lineHeight: 28,
-  },
-
-  nextButton: {
-    marginTop: 16,
-    backgroundColor: '#111',
-    paddingHorizontal: 48,
-    paddingVertical: 16,
-    borderRadius: 32,
-  },
-
-  nextText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
+    color: C.textSecondary,
+    lineHeight: 26,
+    maxWidth: 380,
   },
 
   ctaButton: {
-    marginTop: 16,
-    backgroundColor: '#2563eb',
+    marginTop: 20,
+    backgroundColor: C.accent,
     paddingHorizontal: 48,
     paddingVertical: 16,
-    borderRadius: 32,
+    borderRadius: RADIUS.button,
   },
 
   ctaText: {
-    color: '#fff',
-    fontSize: 18,
+    color: C.white,
+    fontFamily: MONO,
+    fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 
   dots: {
@@ -135,11 +141,11 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#d1d5db',
+    backgroundColor: C.border,
   },
 
   dotActive: {
-    backgroundColor: '#111',
+    backgroundColor: C.accent,
     width: 24,
   },
 });

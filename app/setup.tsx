@@ -11,7 +11,7 @@ import {
   View,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 export default function SetupScreen() {
   const { drill, skill } = useLocalSearchParams<{ drill: string; skill: string }>();
@@ -123,17 +123,21 @@ const styles = StyleSheet.create({
   },
 
   backText: {
-    fontSize: 16,
-    color: C.primary,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 13,
+    color: C.accent,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
 
   drillLabel: {
-    fontSize: 14,
-    color: C.textSecondary,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 12,
+    color: C.accent,
+    fontWeight: '700',
     textTransform: 'uppercase',
-    letterSpacing: 0.8,
+    letterSpacing: 1.4,
     marginBottom: -16,
   },
 
@@ -141,7 +145,8 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -0.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
   },
 
   section: {
@@ -163,7 +168,7 @@ const styles = StyleSheet.create({
   textInput: {
     borderWidth: 1.5,
     borderColor: C.border,
-    borderRadius: 12,
+    borderRadius: RADIUS.chip,
     padding: 14,
     fontSize: 16,
     color: C.text,
@@ -182,7 +187,7 @@ const styles = StyleSheet.create({
   counterBtn: {
     width: 48,
     height: 48,
-    borderRadius: 12,
+    borderRadius: RADIUS.chip,
     backgroundColor: C.card,
     borderWidth: 1.5,
     borderColor: C.border,
@@ -192,16 +197,17 @@ const styles = StyleSheet.create({
 
   counterBtnText: {
     fontSize: 24,
-    color: C.text,
-    fontWeight: '500',
+    color: C.accent,
+    fontWeight: '700',
     lineHeight: 28,
   },
 
   counterValue: {
+    fontFamily: MONO,
     fontSize: 40,
     fontWeight: '800',
     color: C.text,
-    minWidth: 64,
+    minWidth: 72,
     textAlign: 'center',
   },
 
@@ -212,8 +218,8 @@ const styles = StyleSheet.create({
   },
 
   startBtn: {
-    backgroundColor: C.primary,
-    borderRadius: 16,
+    backgroundColor: C.accent,
+    borderRadius: RADIUS.button,
     paddingVertical: 18,
     alignItems: 'center',
     marginTop: 8,
@@ -221,7 +227,10 @@ const styles = StyleSheet.create({
 
   startBtnText: {
     color: C.white,
-    fontSize: 18,
+    fontFamily: MONO,
+    fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

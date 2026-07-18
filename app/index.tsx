@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 export default function HomeScreen() {
   const [ready, setReady] = useState(false);
@@ -24,8 +24,11 @@ export default function HomeScreen() {
       <View style={styles.container}>
         <View style={styles.hero}>
           <Text style={styles.emoji}>🏀</Text>
-          <Text style={styles.title}>CourtCoach</Text>
-          <Text style={styles.subtitle}>AI Basketball Coaching</Text>
+          <Text style={styles.eyebrow}>AI form coaching</Text>
+          <Text style={styles.title}>
+            Court<Text style={styles.titleAccent}>Coach</Text>
+          </Text>
+          <Text style={styles.subtitle}>Your camera is now a basketball coach.</Text>
         </View>
 
         <View style={styles.actions}>
@@ -34,7 +37,7 @@ export default function HomeScreen() {
             onPress={() => router.push('/skills')}
             activeOpacity={0.85}
           >
-            <Text style={styles.primaryBtnText}>Start Training</Text>
+            <Text style={styles.primaryBtnText}>Start Training →</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -67,25 +70,40 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 10,
   },
 
   emoji: {
-    fontSize: 72,
-    marginBottom: 8,
+    fontSize: 64,
+    marginBottom: 12,
+  },
+
+  eyebrow: {
+    fontFamily: MONO,
+    fontSize: 12,
+    letterSpacing: 1.6,
+    textTransform: 'uppercase',
+    color: C.accent,
+    fontWeight: '700',
   },
 
   title: {
-    fontSize: 42,
+    fontSize: 52,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -1,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+
+  titleAccent: {
+    color: C.accent,
   },
 
   subtitle: {
-    fontSize: 17,
+    fontSize: 16,
     color: C.textSecondary,
     fontWeight: '500',
+    textAlign: 'center',
   },
 
   actions: {
@@ -93,30 +111,36 @@ const styles = StyleSheet.create({
   },
 
   primaryBtn: {
-    backgroundColor: C.primary,
-    borderRadius: 16,
+    backgroundColor: C.accent,
+    borderRadius: RADIUS.button,
     paddingVertical: 18,
     alignItems: 'center',
   },
 
   primaryBtnText: {
     color: C.white,
-    fontSize: 18,
+    fontFamily: MONO,
+    fontSize: 15,
     fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 
   secondaryBtn: {
-    backgroundColor: C.card,
-    borderRadius: 16,
+    backgroundColor: 'transparent',
+    borderRadius: RADIUS.button,
     paddingVertical: 18,
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: C.border,
   },
 
   secondaryBtnText: {
     color: C.text,
-    fontSize: 18,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 15,
+    fontWeight: '700',
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
 });

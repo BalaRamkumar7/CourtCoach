@@ -1,7 +1,7 @@
 import { router, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { drills } from '../constants/drills';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 const SKILL_LABELS: Record<string, string> = {
   shooting: 'Shooting',
@@ -21,17 +21,19 @@ export default function DrillScreen() {
           <Text style={styles.backText}>← Back</Text>
         </TouchableOpacity>
 
+        <Text style={styles.eyebrow}>{skillLabel} drills</Text>
         <Text style={styles.title}>{skillLabel}</Text>
         <Text style={styles.subtitle}>Select a drill to get started</Text>
 
         <View style={styles.cards}>
-          {selectedDrills.map((drill) => (
+          {selectedDrills.map((drill, i) => (
             <TouchableOpacity
               key={drill}
               style={styles.card}
               onPress={() => router.push({ pathname: '/setup', params: { drill, skill } })}
               activeOpacity={0.8}
             >
+              <Text style={styles.cardNum}>{String(i + 1).padStart(2, '0')}</Text>
               <Text style={styles.cardLabel}>{drill}</Text>
               <Text style={styles.chevron}>›</Text>
             </TouchableOpacity>
@@ -58,16 +60,30 @@ const styles = StyleSheet.create({
   },
 
   backText: {
-    fontSize: 16,
-    color: C.primary,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 13,
+    color: C.accent,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+
+  eyebrow: {
+    fontFamily: MONO,
+    fontSize: 12,
+    letterSpacing: 1.4,
+    textTransform: 'uppercase',
+    color: C.accent,
+    fontWeight: '700',
+    marginBottom: 6,
   },
 
   title: {
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -0.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
     marginBottom: 6,
   },
 
@@ -83,27 +99,34 @@ const styles = StyleSheet.create({
 
   card: {
     backgroundColor: C.card,
-    borderRadius: 14,
+    borderRadius: RADIUS.card,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: 14,
     borderWidth: 1,
     borderColor: C.border,
-    shadowColor: '#000',
-    shadowOpacity: 0.03,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 1 },
+  },
+
+  cardNum: {
+    fontFamily: MONO,
+    fontSize: 14,
+    color: C.accent,
+    fontWeight: '700',
   },
 
   cardLabel: {
+    flex: 1,
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
     color: C.text,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
 
   chevron: {
-    fontSize: 22,
-    color: C.textTertiary,
+    fontSize: 24,
+    color: C.accent,
+    fontWeight: '700',
   },
 });

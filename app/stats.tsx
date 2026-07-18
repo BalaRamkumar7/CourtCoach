@@ -2,7 +2,7 @@ import { SafeAreaView, ScrollView, StyleSheet, Text, TouchableOpacity, View } fr
 import { router } from 'expo-router';
 import { useSession } from '../context/sessioncontext';
 import { SessionRecord } from '../context/sessioncontext';
-import { C } from '../constants/theme';
+import { C, MONO, RADIUS } from '../constants/theme';
 
 function formatDate(ts: number) {
   return new Date(ts).toLocaleDateString(undefined, {
@@ -42,18 +42,18 @@ function getStreak(sessions: SessionRecord[]) {
 
 const RATING_STYLE: Record<string, object> = {
   Excellent: { backgroundColor: C.successLight },
-  Good: { backgroundColor: C.primaryLight },
-  'Almost There': { backgroundColor: C.skyLight },
-  Moderate: { backgroundColor: C.warningLight },
+  Good: { backgroundColor: C.accentTint },
+  'Almost There': { backgroundColor: C.warningLight },
+  Moderate: { backgroundColor: C.borderLight },
   Developing: { backgroundColor: C.dangerLight },
 };
 
 const RATING_TEXT: Record<string, object> = {
-  Excellent: { color: '#166534' },
-  Good: { color: '#1e40af' },
-  'Almost There': { color: '#0369a1' },
-  Moderate: { color: '#854d0e' },
-  Developing: { color: '#991b1b' },
+  Excellent: { color: '#1F6B47' },
+  Good: { color: C.accentDeep },
+  'Almost There': { color: '#8A5A12' },
+  Moderate: { color: C.textSecondary },
+  Developing: { color: '#8E2A20' },
 };
 
 export default function StatsScreen() {
@@ -174,16 +174,20 @@ const styles = StyleSheet.create({
   },
 
   backText: {
-    fontSize: 16,
-    color: C.primary,
-    fontWeight: '600',
+    fontFamily: MONO,
+    fontSize: 13,
+    color: C.accent,
+    fontWeight: '700',
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
   },
 
   title: {
     fontSize: 32,
     fontWeight: '800',
     color: C.text,
-    letterSpacing: -0.5,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
     marginBottom: 24,
   },
 
@@ -210,9 +214,10 @@ const styles = StyleSheet.create({
   },
 
   statNumber: {
-    fontSize: 28,
+    fontFamily: MONO,
+    fontSize: 30,
     fontWeight: '800',
-    color: C.text,
+    color: C.accent,
   },
 
   streakNumber: {
@@ -229,9 +234,11 @@ const styles = StyleSheet.create({
   },
 
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '800',
     color: C.text,
+    letterSpacing: 0.4,
+    textTransform: 'uppercase',
     marginBottom: 12,
     marginTop: 8,
   },
@@ -325,8 +332,10 @@ const styles = StyleSheet.create({
 
   sessionDrill: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: '800',
     color: C.text,
+    letterSpacing: 0.3,
+    textTransform: 'uppercase',
   },
 
   sessionDate: {
@@ -353,8 +362,11 @@ const styles = StyleSheet.create({
   },
 
   ratingText: {
-    fontSize: 12,
+    fontFamily: MONO,
+    fontSize: 11,
     fontWeight: '700',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
   },
 
   noRating: {
@@ -363,7 +375,8 @@ const styles = StyleSheet.create({
   },
 
   chevron: {
-    fontSize: 20,
-    color: C.textTertiary,
+    fontSize: 22,
+    color: C.accent,
+    fontWeight: '700',
   },
 });
