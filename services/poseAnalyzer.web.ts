@@ -75,5 +75,7 @@ export function extractMetrics(result: any, drill: string): PoseMetrics | null {
 
   if (isDribbling) return { kneeBend, balance, handPosition, bodyLean };
   if (isPassing)   return { elbowAngle, kneeBend, balance, followThrough };
+  // Layup drops kneeBend (meaningless for a dynamic takeoff) for bodyLean.
+  if (drill === 'Layup') return { elbowAngle, releaseHeight, balance, followThrough, bodyLean };
   return { elbowAngle, kneeBend, releaseHeight, balance, followThrough };
 }

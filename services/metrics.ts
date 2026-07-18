@@ -129,11 +129,6 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       min: 60, max: 90, warnMin: 50, warnMax: 100,
       fakeMin: 40, fakeMax: 110,
     },
-    kneeBend: {
-      label: 'Knee Bend', unit: '°', idealLabel: '77–122°',
-      min: 77, max: 122, warnMin: 67, warnMax: 132,
-      fakeMin: 60, fakeMax: 145,
-    },
     releaseHeight: {
       label: 'Release Height', unit: '/100', idealLabel: '100+',
       min: 100, max: 125, warnMin: 90, warnMax: 125,
@@ -148,6 +143,14 @@ const DRILL_CONFIGS: Record<string, DrillConfig> = {
       label: 'Follow-Through', unit: '/100', idealLabel: '60–79',
       min: 60, max: 79, warnMin: 50, warnMax: 89,
       fakeMin: 40, fakeMax: 95,
+    },
+    // Replaces knee bend: a layup is a dynamic one-foot takeoff, so a single
+    // "ideal" knee angle is meaningless. Body control (staying upright, not
+    // drifting sideways on the drive) is the coachable, measurable signal.
+    bodyLean: {
+      label: 'Body Control', unit: '/100', idealLabel: '65+',
+      min: 65, max: 100, warnMin: 50, warnMax: 100,
+      fakeMin: 45, fakeMax: 100,
     },
   },
 
