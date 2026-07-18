@@ -4,6 +4,7 @@ import { PoseMetrics } from '../services/metrics';
 interface Props {
   drill: string;
   onMetrics: (metrics: PoseMetrics) => void;
+  onRep?: (metrics: PoseMetrics) => void;
   style?: any;
 }
 

@@ -1,22 +1,35 @@
 import React, { useEffect, useRef } from 'react';
 import { PoseMetrics } from '../services/metrics';
 import { initPoseLandmarker, extractMetrics } from '../services/poseAnalyzer.web';
+import { createShotDetector, ShotDetector } from '../services/repDetector';
 
 interface Props {
   drill: string;
   onMetrics: (metrics: PoseMetrics) => void;
+  onRep?: (metrics: PoseMetrics) => void;
   style?: React.CSSProperties;
 }
 
-export default function PoseCamera({ drill, onMetrics, style }: Props) {
+const SHOOTING_DRILLS = ['Free Throw', 'Jump Shot', '3-Point Shot', 'Layup'];
+
+export default function PoseCamera({ drill, onMetrics, onRep, style }: Props) {
   const videoRef  = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef    = useRef<number>(0);
   const activeRef = useRef(true);
 
+  // Keep latest callbacks in refs so the rAF loop never uses a stale closure.
+  const onMetricsRef = useRef(onMetrics);
+  const onRepRef     = useRef(onRep);
+  onMetricsRef.current = onMetrics;
+  onRepRef.current     = onRep;
+
   useEffect(() => {
     activeRef.current = true;
     let stream: MediaStream | null = null;
+    const detector: ShotDetector | null = SHOOTING_DRILLS.includes(drill)
+      ? createShotDetector()
+      : null;
 
     async function start() {
       try {
@@ -60,9 +73,26 @@ export default function PoseCamera({ drill, onMetrics, style }: Props) {
             drawSkeleton(ctx, result.landmarks[0], canvas.width, canvas.height);
           }
 
-          // Extract and report metrics every 10 frames (~300ms at 30fps)
+          // Extract and report metrics for this frame
           const metrics = extractMetrics(result, drill);
-          if (metrics) onMetrics(metrics);
+          if (metrics) {
+            onMetricsRef.current(metrics);
+
+            // Shot-release detection (shooting drills only)
+            if (detector && result.landmarks?.length) {
+              const lm = result.landmarks[0];
+              const rep = detector.push({
+                ts,
+                noseY: lm[0].y,
+                wristY: lm[16].y,      // right (shooting-side) wrist
+                shoulderY: lm[12].y,   // right shoulder
+                elbowAngle: metrics.elbowAngle ?? 180,
+                kneeBend: metrics.kneeBend ?? 180,
+                metrics,
+              });
+              if (rep) onRepRef.current?.(rep);
+            }
+          }
         }
 
         rafRef.current = requestAnimationFrame(loop);

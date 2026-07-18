@@ -18,8 +18,9 @@ import { PoseMetrics, toDisplayMetrics } from '../services/metrics';
 import PoseCamera from '../components/PoseCamera';
 import { C, MONO, RADIUS } from '../constants/theme';
 
-const PAUSE_BETWEEN_TIPS_MS = 3000;
-const SCAN_DELAY_MS = 4000; // time to let camera + pose model initialise before first tip
+const PAUSE_BETWEEN_TIPS_MS = 3000;  // timer-mode cadence (non-shooting / native)
+const SCAN_DELAY_MS = 4000;          // let camera + pose model initialise first
+const FALLBACK_MS = 14000;           // event mode: coach on current pose if no shot is detected for this long
 
 const STATUS_COLOR = {
   good: '#22c55e',
@@ -56,95 +57,126 @@ export default function CameraScreen() {
   const maxShots      = shots    ? parseInt(shots, 10) : null;
   const maxDurationMs = duration ? parseInt(duration, 10) * 60 * 1000 : null;
 
+  // Shot-triggered coaching only where we have real pose tracking.
+  const isEventDriven = Platform.OS === 'web' && isShooting;
+
   const { addFeedback } = useSession();
   const activeRef        = useRef(false);
+  const busyRef          = useRef(false);
+  const scanningRef      = useRef(true);
   const startTimeRef     = useRef<number>(0);
   const shotCountRef     = useRef(0);
   const latestMetricsRef = useRef<PoseMetrics | null>(null);
 
-  // Keep the ref in sync with state (PoseCamera calls this continuously)
   function handlePoseMetrics(metrics: PoseMetrics) {
     latestMetricsRef.current = metrics;
     setLiveMetrics(metrics);
   }
 
-  // Tick once a second so the countdown / progress bar stays live for timed drills.
+  function navigateToFeedback() {
+    if (!activeRef.current) return;
+    activeRef.current = false;
+    Speech.stop();
+    router.push({ pathname: '/feedback', params: { drill, skill } });
+  }
+
+  function maybeFinish() {
+    if (!activeRef.current) return;
+    if (maxShots && shotCountRef.current >= maxShots) navigateToFeedback();
+    else if (maxDurationMs && Date.now() - startTimeRef.current >= maxDurationMs) navigateToFeedback();
+  }
+
+  // One coaching turn: ask Claude, show + speak the tip. Guarded so turns never overlap.
+  async function coachOnce(metrics: PoseMetrics | null, countAsRep: boolean) {
+    if (!activeRef.current || busyRef.current || scanningRef.current) return;
+    busyRef.current = true;
+    setIsAnalyzing(true);
+    try {
+      const { tip, metrics: used } = await getRealtimeTip(
+        drill ?? 'Free Throw',
+        focus ?? '',
+        metrics ?? undefined,
+      );
+      if (!activeRef.current) return;
+      setLiveMetrics(used);
+      setFeedback(tip);
+      addFeedback(tip, used);
+      setHasError(false);
+      setIsAnalyzing(false);
+      if (countAsRep) {
+        shotCountRef.current += 1;
+        setShotCount(shotCountRef.current);
+      }
+      await speak(tip, () => !activeRef.current);
+    } catch (err: any) {
+      if (activeRef.current) {
+        console.error('Coaching tip error:', err?.message ?? String(err));
+        setHasError(true);
+        setIsAnalyzing(false);
+        // The last tip stays on screen; we simply try again on the next rep / tick.
+      }
+    } finally {
+      busyRef.current = false;
+      maybeFinish();
+    }
+  }
+
+  // Fired by PoseCamera when a shot release is detected (event mode only).
+  function handleRep(metrics: PoseMetrics) {
+    coachOnce(metrics, true);
+  }
+
+  // Live countdown / auto-finish for timed (non-shooting) drills.
   useEffect(() => {
     if (!maxDurationMs) return;
-    const id = setInterval(() => setNow(Date.now()), 500);
+    const id = setInterval(() => {
+      setNow(Date.now());
+      if (activeRef.current && startTimeRef.current && Date.now() - startTimeRef.current >= maxDurationMs) {
+        navigateToFeedback();
+      }
+    }, 500);
     return () => clearInterval(id);
   }, [maxDurationMs]);
 
   useEffect(() => {
-    // On web, we don't need expo-camera permission — getUserMedia is handled inside PoseCamera
     if (Platform.OS !== 'web' && !permission?.granted) return;
 
     activeRef.current    = true;
     startTimeRef.current = Date.now();
     shotCountRef.current = 0;
+    let fallbackId: ReturnType<typeof setInterval> | undefined;
 
-    async function coachingLoop() {
-      // Wait for camera + MediaPipe to initialise before firing the first tip
+    (async () => {
       setIsScanning(true);
+      scanningRef.current = true;
       await new Promise((r) => setTimeout(r, SCAN_DELAY_MS));
+      if (!activeRef.current) return;
       setIsScanning(false);
+      scanningRef.current = false;
 
-      while (activeRef.current) {
-        if (maxDurationMs && Date.now() - startTimeRef.current >= maxDurationMs) {
-          navigateToFeedback(); break;
-        }
-        if (maxShots && shotCountRef.current >= maxShots) {
-          navigateToFeedback(); break;
-        }
-
-        setIsAnalyzing(true);
-        try {
-          // Pass real pose metrics if available (web/MediaPipe), else Claude generates fake ones
-          const { tip, metrics } = await getRealtimeTip(
-            drill ?? 'Free Throw',
-            focus ?? '',
-            latestMetricsRef.current ?? undefined,
-          );
+      if (isEventDriven) {
+        // Coaching is triggered by handleRep. Safety net: if no shot is seen for a
+        // while, coach on the current pose so guidance doesn't stall.
+        fallbackId = setInterval(() => {
+          if (activeRef.current && !busyRef.current) coachOnce(latestMetricsRef.current, false);
+        }, FALLBACK_MS);
+      } else {
+        // Timer cadence (non-shooting drills, and native where pose is unavailable).
+        while (activeRef.current) {
+          await coachOnce(latestMetricsRef.current, isShooting);
           if (!activeRef.current) break;
-
-          setLiveMetrics(metrics);
-          setFeedback(tip);
-          addFeedback(tip, metrics);
-          setHasError(false);
-          setIsAnalyzing(false);
-
-          if (isShooting) {
-            shotCountRef.current += 1;
-            setShotCount(shotCountRef.current);
-          }
-
-          await speak(tip, () => !activeRef.current);
-        } catch (err: any) {
-          if (!activeRef.current) break;
-          console.error('Coaching tip error:', err?.message ?? String(err));
-          setHasError(true);
-          setIsAnalyzing(false);
-          // The last tip stays on screen; the loop retries after the pause below.
+          await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_TIPS_MS));
         }
-
-        if (!activeRef.current) break;
-        await new Promise((r) => setTimeout(r, PAUSE_BETWEEN_TIPS_MS));
       }
-    }
-
-    coachingLoop();
+    })();
 
     return () => {
       activeRef.current = false;
+      if (fallbackId) clearInterval(fallbackId);
       Speech.stop();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Platform.OS === 'web' ? true : permission?.granted, drill]);
-
-  function navigateToFeedback() {
-    activeRef.current = false;
-    Speech.stop();
-    router.push({ pathname: '/feedback', params: { drill, skill } });
-  }
 
   // ─── Derived UI state ──────────────────────────────────────────────────────
   const displayMetrics = liveMetrics ? toDisplayMetrics(liveMetrics, drill ?? 'Free Throw') : null;
@@ -176,8 +208,8 @@ export default function CameraScreen() {
     scan: 'Getting you in frame',
     think: 'Coaching',
     error: "Can't reach the coach — retrying",
-    tip: 'Coach',
-    idle: 'Ready',
+    tip: isEventDriven ? 'Nice shot' : 'Coach',
+    idle: isEventDriven ? 'Take your shot' : 'Ready',
   };
   const STATUS_DOT: Record<CoachState, string> = {
     scan: C.accent,
@@ -191,7 +223,9 @@ export default function CameraScreen() {
     feedback ||
     (coachState === 'scan'
       ? "Get in frame — I'll start coaching in a moment."
-      : 'Get in frame and start your reps.');
+      : isEventDriven
+        ? 'Get in frame and take a shot — I coach each one.'
+        : 'Get in frame and start your reps.');
 
   function renderOverlays() {
     return (
@@ -263,6 +297,7 @@ export default function CameraScreen() {
         <PoseCamera
           drill={drill ?? 'Free Throw'}
           onMetrics={handlePoseMetrics}
+          onRep={isEventDriven ? handleRep : undefined}
           style={{ position: 'absolute', inset: 0 } as any}
         />
         {renderOverlays()}
