@@ -1,0 +1,4 @@
+# Static site config — the CourtCoach marketing + research site lives in /website.
+# If you connect this repo to Netlify, it publishes that folder with no build step.
+[build]
+  publish = "website"
