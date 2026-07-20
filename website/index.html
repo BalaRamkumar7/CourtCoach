@@ -257,6 +257,26 @@
     display: inline-block; font-family: var(--f-mono); font-size: 0.62rem; letter-spacing: 0.08em;
     text-transform: uppercase; color: var(--faint); border: 1px dashed var(--line); padding: 0.2rem 0.5rem; border-radius: 4px;
   }
+  /* logo mark (inline SVG) */
+  .brand .mark, .hubnav .brand .mark { background: none !important; box-shadow: none !important; border-radius: 0 !important; color: var(--accent); display: block; flex: none; }
+  .brand .mark::before, .brand .mark::after, .hubnav .brand .mark::before, .hubnav .brand .mark::after { content: none !important; display: none !important; }
+
+  /* waitlist */
+  .nav-pill { background: transparent; cursor: pointer; }
+  .wl-overlay { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1.5rem; background: rgba(0,0,0,0.55); backdrop-filter: blur(3px); }
+  .wl-overlay[hidden] { display: none; }
+  .wl-modal { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 2rem; max-width: 420px; width: 100%; position: relative; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5); }
+  .wl-close { position: absolute; top: 0.7rem; right: 1rem; background: none; border: none; color: var(--muted); font-size: 1.7rem; line-height: 1; cursor: pointer; }
+  .wl-close:hover { color: var(--ink); }
+  .wl-title { font-family: var(--f-display); text-transform: uppercase; font-weight: 700; font-size: 1.9rem; margin: 0.5rem 0 0; letter-spacing: 0.01em; color: var(--ink); }
+  .wl-sub { color: var(--muted); font-size: 0.98rem; margin: 0.6rem 0 1.3rem; }
+  .wl-form { display: flex; flex-direction: column; gap: 0.7rem; }
+  .wl-input { font-family: var(--f-body); font-size: 1rem; padding: 0.8rem 0.9rem; border: 1.5px solid var(--line); border-radius: 8px; background: var(--surface-2); color: var(--ink); }
+  .wl-input:focus { outline: none; border-color: var(--accent); }
+  .wl-submit { font-family: var(--f-mono); font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 0.85rem; cursor: pointer; }
+  .wl-submit:hover { background: var(--accent-deep); }
+  .wl-hp { position: absolute; left: -9999px; }
+  .wl-done { color: var(--accent-deep); font-weight: 600; margin: 0.4rem 0 0; }
 </style>
 </head>
 <body>
@@ -265,14 +285,14 @@
 <header class="nav">
   <div class="shell nav-in">
     <a class="brand" href="#top" aria-label="CourtCoach home">
-      <span class="mark" aria-hidden="true"></span>
+      <img class="mark" src="/assets/logo.png" alt="CourtCoach logo">
       <span class="name">Court<b>Coach</b></span>
     </a>
     <nav class="nav-links">
       <a href="#how">How it works</a>
       <a href="#drills">Drills</a>
       <a href="#science">Research</a>
-      <a class="nav-pill" href="#top">Coming to iOS &amp; Android</a>
+      <button type="button" class="nav-pill" id="waitlist-open">Coming to iOS &amp; Android</button>
     </nav>
   </div>
 </header>
@@ -499,7 +519,7 @@
   <div class="shell">
     <div class="foot-in">
       <a class="brand" href="#top">
-        <span class="mark" aria-hidden="true"></span>
+        <img class="mark" src="/assets/logo.png" alt="CourtCoach logo">
         <span class="name">Court<b>Coach</b></span>
       </a>
       <div class="foot-links">
@@ -533,6 +553,62 @@
         el.textContent = v;
       });
     }, 900);
+  })();
+</script>
+
+<!-- Waitlist modal -->
+<div class="wl-overlay" id="waitlist" hidden>
+  <div class="wl-modal" role="dialog" aria-modal="true" aria-labelledby="wl-title">
+    <button class="wl-close" id="waitlist-close" type="button" aria-label="Close">&times;</button>
+    <span class="eyebrow">Coming to iOS &amp; Android</span>
+    <h2 class="wl-title" id="wl-title">Join the waitlist</h2>
+    <p class="wl-sub">Be first to know when CourtCoach lands on your phone. No spam — just launch news.</p>
+    <form name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" class="wl-form" id="waitlist-form">
+      <input type="hidden" name="form-name" value="waitlist">
+      <p class="wl-hp"><label>Leave this empty: <input name="bot-field"></label></p>
+      <input class="wl-input" type="email" name="email" placeholder="you@email.com" required autocomplete="email" aria-label="Email address">
+      <button class="wl-submit" type="submit">Notify me &rarr;</button>
+    </form>
+    <p class="wl-done" id="waitlist-done" hidden>You're on the list — we'll be in touch. 🏀</p>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var overlay = document.getElementById('waitlist');
+    var openBtn = document.getElementById('waitlist-open');
+    var closeBtn = document.getElementById('waitlist-close');
+    var form = document.getElementById('waitlist-form');
+    var done = document.getElementById('waitlist-done');
+    if (!overlay || !openBtn) return;
+
+    function open() {
+      overlay.hidden = false;
+      var input = overlay.querySelector('.wl-input');
+      if (input) setTimeout(function () { input.focus(); }, 40);
+    }
+    function close() { overlay.hidden = true; }
+
+    openBtn.addEventListener('click', open);
+    closeBtn.addEventListener('click', close);
+    overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var body = new URLSearchParams(new FormData(form)).toString();
+      fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body,
+      }).then(function () {
+        form.hidden = true;
+        done.hidden = false;
+      }).catch(function () {
+        form.hidden = true;
+        done.hidden = false;
+      });
+    });
   })();
 </script>
 

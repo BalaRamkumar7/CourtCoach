@@ -96,13 +96,16 @@
 
   footer{border-top:1px solid var(--line);padding:2rem 0 3rem;}
   .foot-note{font-family:var(--f-mono);font-size:.72rem;color:var(--faint);}
+  /* logo mark (inline SVG) */
+  .brand .mark, .hubnav .brand .mark { background: none !important; box-shadow: none !important; border-radius: 0 !important; color: var(--accent); display: block; flex: none; }
+  .brand .mark::before, .brand .mark::after, .hubnav .brand .mark::before, .hubnav .brand .mark::after { content: none !important; display: none !important; }
 </style>
 </head>
 <body>
 
 <header class="nav">
   <div class="nav-in">
-    <a class="brand" href="../index.html"><span class="mark" aria-hidden="true"></span> Court<b>Coach</b></a>
+    <a class="brand" href="../index.html"><img class="mark" src="/assets/logo.png" alt="CourtCoach logo"> <span class="wm">Court<b>Coach</b></span></a>
     <a class="nav-back" href="index.html">← All research</a>
   </div>
 </header>
