@@ -277,6 +277,13 @@
   .wl-submit:hover { background: var(--accent-deep); }
   .wl-hp { position: absolute; left: -9999px; }
   .wl-done { color: var(--accent-deep); font-weight: 600; margin: 0.4rem 0 0; }
+
+  /* waitlist CTA band */
+  .wl-cta { border-top: 1px solid var(--line); background: var(--surface); }
+  .wl-cta-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem 2rem; padding: clamp(2.5rem, 5vw, 4rem) 0; }
+  .wl-cta-title { font-family: var(--f-display); text-transform: uppercase; font-weight: 700; font-size: clamp(1.8rem, 4vw, 2.8rem); line-height: 1; letter-spacing: -0.01em; margin: 0.7rem 0 0; }
+  .wl-cta-sub { color: var(--muted); font-size: 1.05rem; margin: 0.8rem 0 0; max-width: 46ch; }
+  .wl-cta .btn { flex: none; }
 </style>
 </head>
 <body>
@@ -292,7 +299,8 @@
       <a href="#how">How it works</a>
       <a href="#drills">Drills</a>
       <a href="#science">Research</a>
-      <button type="button" class="nav-pill" id="waitlist-open">Coming to iOS &amp; Android</button>
+      <a href="giveback.html">Give Back</a>
+      <button type="button" class="nav-pill" data-waitlist-open>Coming to iOS &amp; Android</button>
     </nav>
   </div>
 </header>
@@ -514,6 +522,18 @@
   </div>
 </section>
 
+<!-- ================= WAITLIST CTA ================= -->
+<section class="wl-cta">
+  <div class="shell wl-cta-in">
+    <div>
+      <span class="eyebrow">Coming to iOS &amp; Android</span>
+      <h2 class="wl-cta-title">Be first on the court.</h2>
+      <p class="wl-cta-sub">Join the waitlist and we'll tell you the moment CourtCoach lands on your phone.</p>
+    </div>
+    <button type="button" class="btn btn-primary" data-waitlist-open>Join the waitlist <span class="arrow">&rarr;</span></button>
+  </div>
+</section>
+
 <!-- ================= FOOTER ================= -->
 <footer>
   <div class="shell">
@@ -576,11 +596,11 @@
 <script>
   (function () {
     var overlay = document.getElementById('waitlist');
-    var openBtn = document.getElementById('waitlist-open');
+    var openers = document.querySelectorAll('[data-waitlist-open]');
     var closeBtn = document.getElementById('waitlist-close');
     var form = document.getElementById('waitlist-form');
     var done = document.getElementById('waitlist-done');
-    if (!overlay || !openBtn) return;
+    if (!overlay) return;
 
     function open() {
       overlay.hidden = false;
@@ -589,7 +609,7 @@
     }
     function close() { overlay.hidden = true; }
 
-    openBtn.addEventListener('click', open);
+    openers.forEach(function (el) { el.addEventListener('click', open); });
     closeBtn.addEventListener('click', close);
     overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !overlay.hidden) close(); });

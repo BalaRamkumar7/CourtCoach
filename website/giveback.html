@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏀</text></svg>">
+<title>Give Back — CourtCoach</title>
+<style>
+  :root {
+    --bg:#EEEBE4; --surface:#FFFFFF; --surface-2:#F6F3EC; --ink:#171410;
+    --muted:#5B554B; --faint:#8C8676; --line:#DCD6C9;
+    --accent:#E8481A; --accent-deep:#B4340E; --accent-tint:#FADFD1; --court:rgba(23,20,16,0.10);
+    --f-display:"Arial Narrow","Helvetica Neue",Helvetica,system-ui,sans-serif;
+    --f-body:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --f-mono:ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){:root{
+    --bg:#100E0A; --surface:#191510; --surface-2:#211C15; --ink:#F5F1E8;
+    --muted:#ADA595; --faint:#726B5C; --line:#2C261D;
+    --accent:#FF6636; --accent-deep:#FF8659; --accent-tint:#3A1D11; --court:rgba(245,241,232,0.09);
+  }}
+  :root[data-theme="dark"]{--bg:#100E0A;--surface:#191510;--surface-2:#211C15;--ink:#F5F1E8;--muted:#ADA595;--faint:#726B5C;--line:#2C261D;--accent:#FF6636;--accent-deep:#FF8659;--accent-tint:#3A1D11;--court:rgba(245,241,232,0.09);}
+  :root[data-theme="light"]{--bg:#EEEBE4;--surface:#FFFFFF;--surface-2:#F6F3EC;--ink:#171410;--muted:#5B554B;--faint:#8C8676;--line:#DCD6C9;--accent:#E8481A;--accent-deep:#B4340E;--accent-tint:#FADFD1;--court:rgba(23,20,16,0.10);}
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family:var(--f-body); line-height:1.6; -webkit-font-smoothing:antialiased; }
+  a { color: inherit; text-decoration: none; }
+  .shell { max-width: 920px; margin: 0 auto; padding: 0 1.5rem; }
+  .eyebrow { font-family:var(--f-mono); font-size:0.72rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); font-weight:700; }
+
+  header.nav { position:sticky; top:0; z-index:20; background:color-mix(in srgb,var(--bg) 88%,transparent); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .nav-in { max-width:1080px; margin:0 auto; padding:0 1.5rem; height:60px; display:flex; align-items:center; justify-content:space-between; }
+  .brand { display:flex; align-items:center; gap:0.55rem; font-family:var(--f-display); font-weight:700; text-transform:uppercase; font-size:1.2rem; letter-spacing:0.02em; }
+  .brand .mark { width:26px; height:26px; flex:none; display:block; }
+  .brand b { color:var(--accent); }
+  .nav-links { display:flex; align-items:center; gap:1.7rem; }
+  .nav-links a { font-family:var(--f-mono); font-size:0.8rem; font-weight:600; letter-spacing:0.03em; color:var(--muted); text-transform:uppercase; }
+  .nav-links a:hover, .nav-links a.active { color:var(--accent); }
+  @media (max-width:720px){ .nav-links a:not(.active){ display:none; } }
+
+  .hero { padding: clamp(3rem,7vw,5rem) 0 2.4rem; border-bottom:1px solid var(--line); position:relative; overflow:hidden; }
+  .hero::before { content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background-image: radial-gradient(circle at 88% 20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 42%); }
+  .hero .shell { position:relative; z-index:1; }
+  h1 { font-family:var(--f-display); text-transform:uppercase; font-weight:700; font-size:clamp(2.8rem,7vw,5rem); line-height:0.94; letter-spacing:-0.005em; margin:0.9rem 0 0; text-wrap:balance; }
+  h1 .hl { color:var(--accent); }
+  .dek { font-size:1.2rem; color:var(--muted); max-width:60ch; margin:1.3rem 0 0; line-height:1.5; }
+  .status-tag { display:inline-flex; align-items:center; gap:0.5rem; margin-top:1.6rem; font-family:var(--f-mono); font-size:0.72rem; letter-spacing:0.06em; text-transform:uppercase; color:var(--muted); border:1px solid var(--line); background:var(--surface); border-radius:999px; padding:0.4rem 0.85rem; }
+  .status-tag .dot { width:8px; height:8px; border-radius:50%; background:var(--accent); }
+
+  section.block { padding: clamp(2.5rem,5vw,3.5rem) 0; border-bottom:1px solid var(--line); }
+  h2 { font-family:var(--f-display); text-transform:uppercase; font-weight:700; font-size:clamp(1.7rem,3.5vw,2.4rem); line-height:1.02; letter-spacing:0.005em; margin:0.6rem 0 0; }
+  p.body { font-size:1.1rem; color:var(--ink); line-height:1.6; margin:1rem 0 0; max-width:64ch; }
+  p.body.muted { color:var(--muted); }
+
+  .plan { display:flex; flex-direction:column; gap:0; border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:1.6rem; }
+  .plan .row { display:grid; grid-template-columns:2.6rem 1fr; gap:1rem; padding:1.3rem 1.4rem; background:var(--surface); border-bottom:1px solid var(--line); }
+  .plan .row:last-child { border-bottom:none; }
+  .plan .n { font-family:var(--f-mono); font-weight:700; color:var(--accent); font-size:0.9rem; padding-top:0.15rem; }
+  .plan .row h3 { font-family:var(--f-display); text-transform:uppercase; font-size:1.15rem; letter-spacing:0.02em; margin:0 0 0.3rem; }
+  .plan .row p { margin:0; color:var(--muted); font-size:0.98rem; line-height:1.5; }
+
+  .principles { display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:1.6rem; }
+  @media (max-width:620px){ .principles{ grid-template-columns:1fr; } }
+  .principle { background:var(--surface); padding:1.3rem 1.4rem; }
+  .principle h3 { font-family:var(--f-display); text-transform:uppercase; font-size:1.05rem; letter-spacing:0.02em; margin:0 0 0.35rem; }
+  .principle p { margin:0; color:var(--muted); font-size:0.94rem; line-height:1.5; }
+
+  .callout { background:var(--accent-tint); border:1px solid #F1C7B0; border-left:3px solid var(--accent); border-radius:12px; padding:1.4rem 1.6rem; margin-top:1.6rem; }
+  .callout p { margin:0; font-size:1.05rem; line-height:1.55; color:var(--ink); }
+  .callout .lbl { font-family:var(--f-mono); font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--accent); font-weight:700; display:block; margin-bottom:0.5rem; }
+
+  .cta-row { display:flex; flex-wrap:wrap; gap:0.8rem; margin-top:1.6rem; }
+  .btn { display:inline-flex; align-items:center; gap:0.5rem; font-family:var(--f-mono); font-size:0.82rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; padding:0.85rem 1.35rem; border-radius:6px; border:1.5px solid transparent; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:var(--accent-deep); }
+  .btn-ghost { border-color:var(--line); color:var(--ink); }
+  .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+  footer { padding: 2.5rem 0 3rem; }
+  .foot-note { font-family:var(--f-mono); font-size:0.74rem; color:var(--faint); letter-spacing:0.03em; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <a class="brand" href="index.html"><img class="mark" src="/assets/logo.png" alt="CourtCoach logo"> Court<b>Coach</b></a>
+    <nav class="nav-links">
+      <a href="index.html#how">How it works</a>
+      <a href="index.html#drills">Drills</a>
+      <a href="research/index.html">Research</a>
+      <a href="giveback.html" class="active">Give Back</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="shell">
+    <span class="eyebrow">Our mission — a work in progress</span>
+    <h1>Coaching shouldn't be a <span class="hl">privilege.</span></h1>
+    <p class="dek">CourtCoach exists to put real coaching in reach of anyone with a phone. Our give-back plan takes that one step further: helping fund basketball coaching for kids who can't access it at all — in underserved communities across the US and around the world.</p>
+    <span class="status-tag"><span class="dot"></span> Status: in planning — no commitments finalized yet</span>
+  </div>
+</section>
+
+<section class="block">
+  <div class="shell">
+    <span class="eyebrow">The idea</span>
+    <h2>Talent is everywhere. Coaching isn't.</h2>
+    <p class="body">In a lot of neighborhoods — and a lot of countries — kids grow up playing basketball but rarely get taught how to actually get better. No coach, no feedback, no path. That gap is exactly what CourtCoach was built to close, and we don't want to stop at the players who can already reach us.</p>
+    <p class="body muted">So the plan is simple: use CourtCoach to help fund the people already doing this work on the ground — organizations that put real coaches and real programs in front of kids who'd otherwise go without.</p>
+  </div>
+</section>
+
+<section class="block">
+  <div class="shell">
+    <span class="eyebrow">The plan</span>
+    <h2>What we're working toward.</h2>
+    <div class="plan">
+      <div class="row"><span class="n">01</span><div><h3>Direct a share of contributions</h3><p>We intend to channel a meaningful, fixed share of the contributions CourtCoach receives toward youth-coaching programs — rather than keeping it all in the app.</p></div></div>
+      <div class="row"><span class="n">02</span><div><h3>Partner with a vetted nonprofit</h3><p>We're identifying and vetting a nonprofit partner already delivering basketball coaching to underserved kids, in the US and internationally — real programs, real reach, real transparency.</p></div></div>
+      <div class="row"><span class="n">03</span><div><h3>Say exactly what we do</h3><p>Once it's set, we'll publish the specifics — who the partner is, how much goes to them, and how the money flows — and report the totals over time.</p></div></div>
+    </div>
+    <div class="callout">
+      <span class="lbl">To be clear</span>
+      <p>Nothing here is final yet. We haven't committed to a percentage, announced a partner, or started moving money. This page is our intention — we'd rather share the plan honestly than make a promise we can't yet keep.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="shell">
+    <span class="eyebrow">How we'll do it right</span>
+    <h2>The principles guiding this.</h2>
+    <div class="principles">
+      <div class="principle"><h3>Transparency first</h3><p>When it's live, we'll show where the money goes and publish running totals. No vague "a portion of proceeds."</p></div>
+      <div class="principle"><h3>Real programs</h3><p>Funds go to organizations delivering actual coaching and access on the ground — not overhead, not middlemen.</p></div>
+      <div class="principle"><h3>Honest words</h3><p>We won't call something a tax-deductible donation unless it truly is, and we'll be clear about what's charitable and what keeps the app running.</p></div>
+      <div class="principle"><h3>Local &amp; global</h3><p>Talent doesn't care about zip codes or borders. Our goal is to reach kids both in underserved US cities and abroad.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="shell">
+    <span class="eyebrow">Where we are today</span>
+    <h2>Early, but serious.</h2>
+    <p class="body">This is a plan we're actively building, not a live program — we're in the partner-vetting stage right now. If you want to watch it take shape (and be there when CourtCoach launches), the best way to follow along is the waitlist.</p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="index.html">Follow along <span>&rarr;</span></a>
+      <a class="btn btn-ghost" href="research/index.html">See our research</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="shell">
+    <span class="foot-note">CourtCoach — give-back plan in development. This page describes our intentions, not finalized commitments. We'll update it with specifics once a partnership is in place.</span>
+  </div>
+</footer>
+
+</body>
+</html>

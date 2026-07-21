@@ -20,7 +20,7 @@ export default function HomeScreen() {
   if (!ready) return null;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe}>yea
       <View style={styles.container}>
         <View style={styles.hero}>
           <Text style={styles.emoji}>🏀</Text>
